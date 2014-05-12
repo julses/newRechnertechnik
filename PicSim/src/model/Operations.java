@@ -16,7 +16,6 @@ public class Operations {
 
     Register register = new Register();
 
-
     /*Add the contents of the W register with
      *register 'f'. If 'd' is 0 the result is stored
      *in the W register. If 'd' is 1 the result is
@@ -35,7 +34,7 @@ public class Operations {
         }
         register.checkDC(f, w, true);
         register.checkCarry(f, w, true);
-        //TODO : StatusAffected => Z
+        register.checkZeroBit(value);
         register.incPC();
         register.incCycles();
     }
@@ -95,7 +94,7 @@ public class Operations {
         } else {
             register.write(address, value);
         }
-        //TODO : Affect Status Z
+        register.checkZeroBit(value);
         register.incPC();
         register.incCycles();
     }
@@ -119,7 +118,7 @@ public class Operations {
         } else {
             register.write(address, value);
         }
-        //TODO : Affect Status Z
+        register.checkZeroBit(value);
         register.incPC();
         register.incCycles();
     }
@@ -173,7 +172,7 @@ public class Operations {
         } else {
             register.write(address, value);
         }
-        //TODO : Affect Status Z
+        register.checkZeroBit(value);
         register.incPC();
         register.incCycles();
     }
@@ -226,7 +225,7 @@ public class Operations {
         } else {
             register.write(address, value);
         }
-        //TODO : Affect Status Z
+        register.checkZeroBit(value);
         register.incPC();
         register.incCycles();
     }
@@ -249,7 +248,7 @@ public class Operations {
         } else {
             register.write(address, f);
         }
-        //TODO : Affect Status Z
+        register.checkZeroBit(f);
         register.incPC();
         register.incCycles();
     }
@@ -348,7 +347,7 @@ public class Operations {
             //status = setBitAt(status, 0, 0);
         } else {
             value = f - w;
-            // CarryBIt = 1 da Ergebnis 0 oder positiv
+            // CarryBit = 1 da Ergebnis 0 oder positiv
             //status = setBitAt(status, 0, 1);
         }
         register.write(Register.STATUS, status);
@@ -359,26 +358,84 @@ public class Operations {
         } else {
             register.write(address, value);
         }
-        //TODO : Affect Status Z
-        //TODO : Affect DC
+        register.checkZeroBit(value);
+        register.checkDC(f, w, false);
         register.incPC();
         register.incCycles();
     }
 
+    /*
+     *The upper and lower nibbles of register
+     *'f' are exchanged. If 'd' is 0 the result is
+     *placed in W register. If 'd' is 1 the result
+     *is placed in register 'f'.
+     */
     public void swapf(int instruction) {
-        System.out.println("swapf with: " + instruction);
+        System.out.println("swapf with: " + Integer.toHexString(instruction));
+        instruction = instruction & 0x00FF;
+        int address = instruction & 0x007F;
+        int f = register.getRegValue(address);
+        int upper = f & 0x00F0;
+        upper = upper >>> 4;
+        int lower = f & 0x000F;
+        lower = lower + 15;
+        int value = lower | upper;
+        if(instruction < 0x007F) {
+            register.setW(value);
+        } else {
+            register.write(address, value);
+        }
+        register.incPC();
+        register.incCycles();
     }
 
+    /*
+     *Exclusive OR the contents of the
+     *W register with register 'f'. If 'd' is
+     *0, the result is stored in the W
+     *register. If 'd' is 1, the result is
+     *stored back in register 'f'.
+     */
     public void xorwf(int instruction) {
-        System.out.println("xorwf with: " + instruction);
+        System.out.println("xorwf with: " + Integer.toHexString(instruction));
+        instruction = instruction & 0x00FF;
+        int address = instruction & 0x007F;
+        int f = register.getRegValue(address);
+        int w = register.getW();
+        int value = w ^ f;
+        if(instruction < 0x007F) {
+            register.setW(value);
+        } else {
+            register.write(address, value);
+        }
+        register.checkZeroBit(value);
+        register.incPC();
+        register.incCycles();
     }
 
+    /*
+     *Bit 'b' in register 'f' is cleared.
+     */
     public void bcf(int instruction) {
         System.out.println("bcf with: " + instruction);
+        int address = instruction & 0x007F;
+        int f = register.getRegValue(address);
+        int pos = instruction & 0x0380;
+        int value = f | (0 << pos);
+        register.write(address, value);
+        register.incPC();
+        register.incCycles();
     }
 
     public void bsf(int instruction) {
         System.out.println("bsf with: " + instruction);
+        int address = instruction & 0x007F;
+        int f = register.getRegValue(address);
+        int pos = instruction & 0x0380;
+        int value = f | (1 << pos);
+        register.write(address, value);
+        register.incPC();
+        register.incCycles();
     }
 
     public void btfsc(int instruction) {

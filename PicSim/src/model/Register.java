@@ -125,7 +125,7 @@ public class Register {
     }
 
     public void checkDC(int value, int value2, boolean add) {
-        //If sub=true -> Subtraction
+        //If add=true -> Addition
         if (add) {
             if((value & 0x000F) + value2 > 0x000F){
                     write(STATUS, 0x0002);
@@ -138,16 +138,17 @@ public class Register {
     }
 
     public int checkCarry(int f, int w, boolean add) throws IllegalCarryOperationException {
-        //If sub=true -> Subtraction
+        //If add=true -> Addition
         int value = f & 0x00FF;
+        int status = getRegValue(STATUS);
         if (add) {
             if(value + w > 0x00FF){
-                write(STATUS, 0x0002);
+                write(STATUS, status | (1<<0));
                 return ((value + w) - 0x00FF);
             }
         } else {
             if(value - w < 0){
-                write(STATUS, 0x0002);
+                write(STATUS, status | (1<<0));
                 return (value - w) + 0x00FF;
             }
         }
@@ -158,5 +159,8 @@ public class Register {
         this.cycles++;
     }
 
-
+    public void checkZeroBit(int value) {
+        int status = getRegValue(STATUS);
+        if (value == 0) write(STATUS, (status | (1 << 2)));
+    }
 }
