@@ -465,6 +465,8 @@ public class Operations {
         int value = instruction & 0x00FF;
         //Werte addieren
         register.setW(register.getW() + value);
+        register.incPC();
+        register.incCycles();
     }
 
     /*
@@ -477,6 +479,8 @@ public class Operations {
         int value = instruction & 0x00FF;
         //Werte ver'UND'en
         register.setW(register.getW() & value);
+        register.incPC();
+        register.incCycles();
     }
 
     public void call(int instruction) {
@@ -487,8 +491,21 @@ public class Operations {
         System.out.println("goTo with: " + instruction);
     }
 
+    /*
+     *The contents of the W register is
+     *OR’ed with the eight bit literal 'k'. The
+     *result is placed in the W register.
+     */
     public void iorlw(int instruction) {
         System.out.println("iorlw with: " + instruction);
+        //Maskieren
+        int k = instruction & 0x00FF;
+        //Werte ver'ODER'n
+        int value = register.getW() | k;
+        register.setW(value);
+        register.checkZeroBit(value);
+        register.incPC();
+        register.incCycles();
     }
 
     public void movlw(int instruction) {

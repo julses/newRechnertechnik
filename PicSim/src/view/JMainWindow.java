@@ -2,7 +2,6 @@ package view;
 
 import exceptions.IllegalCarryOperationException;
 import exceptions.NoInstructionException;
-import model.Scan;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +20,6 @@ import java.io.IOException;
 
 public class JMainWindow implements ActionListener {
 
-    private Scan scanner;
     private MenuBar menuBar;
 
     JFrame hauptFenster;
@@ -47,35 +45,55 @@ public class JMainWindow implements ActionListener {
     JMenuItem doku;
     JMenuItem about;
     // Textfeld
-    JTextArea textarea;
+    JTextArea lstFile;
 
     public JMainWindow(MenuBar menubar) {
         this.menuBar = menubar;
         hauptFenster = new JFrame("PicSim 0.0.1");
         container = hauptFenster.getContentPane();
         container.setLayout(new BorderLayout());
+
+        GridLayout buttonLayout = new GridLayout(0,1,10,10);// Layout für das Buttonpanel
+
         JPanel p = new JPanel();
-        container.add(p);
+        JPanel pone=new JPanel();//Panel für das Textfeld des Codes
+        JPanel two = new JPanel();//Panel für Buttons
+
+        two.setLayout(buttonLayout);//Panel two bekommt layout für Buttons übergeben
 
         JMenuBar();
 
         // Textfeld erzeugen
-        textarea = new JTextArea();
+        lstFile = new JTextArea("Bitte wählen sie eine .LST Datei aus.");//Textarea mit Text erstellen
+        JScrollPane scrollPane = new JScrollPane(lstFile);//Scrollbar mit oberfläche verknüpfen
+        lstFile.setEnabled(false);//textfeld nich veraenderbar
+        scrollPane.setPreferredSize(new Dimension(600, 200));//Scrollbar hinzufügen
+        pone.add(scrollPane);//Texfeld mit Scrollbar dem
+        scrollPane.setVisible(true);//Alles sichtbar machen
 
-        hauptFenster.add(menueLeiste, BorderLayout.NORTH);
-        hauptFenster.add(new JScrollPane(textarea), BorderLayout.WEST);
-        p.add(stepButton);
-        p.add(runButton);
-        p.add(stopButton);
+        //Panels dem Hauptfenster hinzufügen
+        container.add(menueLeiste,BorderLayout.NORTH);
+        container.add(p,BorderLayout.CENTER);
+        container.add(pone,BorderLayout.SOUTH);
+        container.add(two,BorderLayout.EAST);
 
-        hauptFenster.setSize(400, 300);
+        // Buttons dem Panel hinzufügen
+        two.add(stepButton);
+        two.add(runButton);
+        two.add(stopButton);
+
+        //Hauptfenster mit Attributen ausstatten
+        hauptFenster.setSize(600, 500);
         hauptFenster.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        hauptFenster.pack();//Passt Buttons an
         hauptFenster.setVisible(true);
     }
 
     private void JMenuBar() {
         stepButton = new JButton("Step");
         stepButton.setVisible(true);
+        stepButton.setPreferredSize(new Dimension(100, 10));
+
         stepButton.addMouseListener(new MouseAdapter() {
            @Override
            public void mouseClicked(MouseEvent e) {

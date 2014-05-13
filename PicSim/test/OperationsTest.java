@@ -279,12 +279,15 @@ public class OperationsTest {
     public void testGoTo() throws Exception {
 
     }
-
-    @org.junit.Test
+*/
+    @Test
     public void testIorlw() throws Exception {
-
+        register.setW(0x9A);
+        pars.exec(0x3835, pars.decode(0x3835));
+        Assert.assertEquals(0xBF, register.getW());
+        Assert.assertTrue(register.getZeroBit());
     }
-
+/*
     @org.junit.Test
     public void testMovlw() throws Exception {
 
