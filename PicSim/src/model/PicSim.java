@@ -1,6 +1,7 @@
 package model;
 
 import view.JMainWindow;
+import view.MenuBar;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,17 +17,24 @@ import java.util.List;
  */
 public class PicSim {
 
-    public static List<String> hexCode;
-    public static List<String> binaryCode;  // Binärcode Liste
-    public static Iterator<String> iterator;
+    private static List<String> hexCode;     // Hexcode Liste
+    private static List<String> binaryCode;  // Binärcode Liste
+    private static Register register;
+    private static Operations operations;
     private static Scan scanner;
-    private Pars parser;
+    private static Pars parser;
+    private static MenuBar menubar;
 
 
     public static void main(String[] args) throws IOException {
         hexCode = new ArrayList<String>();
         binaryCode = new ArrayList<String>();
-        new JMainWindow();
+        register = new Register();
+        operations = new Operations(register);
+        scanner = new Scan(binaryCode, hexCode);
+        parser = new Pars(operations);
+        menubar = new MenuBar(parser, scanner);
+        new JMainWindow(menubar);
     }
 
 }

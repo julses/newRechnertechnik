@@ -1,9 +1,7 @@
 package model;
 
-import com.sun.xml.internal.bind.v2.TODO;
 import exceptions.IllegalCarryOperationException;
 
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,8 +11,12 @@ import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
  * To change this template use File | Settings | File Templates.
  */
 public class Operations {
+    Register register;
+    public Operations(Register register) {
+        this.register = register;
+    }
 
-    Register register = new Register();
+
 
     /*Add the contents of the W register with
      *register 'f'. If 'd' is 0 the result is stored
@@ -22,6 +24,7 @@ public class Operations {
      *stored back in register 'f'.
      */
     public void addwf(int instruction) throws IllegalCarryOperationException {
+        System.out.println("addwf with: " + instruction);
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -30,7 +33,7 @@ public class Operations {
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         register.checkDC(f, w, true);
         register.checkCarry(f, w, true);
@@ -46,6 +49,7 @@ public class Operations {
      *register 'f'.
      */
     public void andwf(int instruction) {
+        System.out.println("andwf with: " + instruction);
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -53,8 +57,9 @@ public class Operations {
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
+        register.checkZeroBit(value);
         register.incPC();
         register.incCycles();
     }
@@ -67,11 +72,13 @@ public class Operations {
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         if(instruction < 0x007F) {
-            System.out.println("clrw Adresse: 0x" + Integer.toHexString(address));
+            System.out.println("clrw value: 0x" + Integer.toHexString(address));
             register.setW(0);
+            register.checkZeroBit(register.getW());
         } else {
             System.out.println("clrf Adresse: 0x" + Integer.toHexString(address));
-            register.write(address, 0);
+            register.setRegValue(address, 0);
+            register.checkZeroBit(register.getRegValue(address));
         }
         register.incPC();
         register.incCycles();
@@ -84,15 +91,15 @@ public class Operations {
      *register 'f'.
      */
     public void comf(int instruction){
+        System.out.println("comf with: " + instruction);
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
-
         int value = (~f & 0xFF);
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         register.checkZeroBit(value);
         register.incPC();
@@ -116,7 +123,7 @@ public class Operations {
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         register.checkZeroBit(value);
         register.incPC();
@@ -143,7 +150,7 @@ public class Operations {
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         //nop
         if (value == 0) {
@@ -162,15 +169,16 @@ public class Operations {
      *register ’f’.
      */
     public void incf(int instruction) {
+        System.out.println("incf with: " + instruction);
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
-        //Incrementierung mit Maskierung falls Wert > 0xFF
-        int value = ++f & 0xFF;
+        int value = ++f;
+        if (value > 255) value=0;
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         register.checkZeroBit(value);
         register.incPC();
@@ -196,7 +204,7 @@ public class Operations {
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         //nop
         if (value == 0) {
@@ -223,7 +231,7 @@ public class Operations {
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         register.checkZeroBit(value);
         register.incPC();
@@ -246,7 +254,7 @@ public class Operations {
         if(instruction < 0x007F) {
             register.setW(f);
         } else {
-            register.write(address, f);
+            register.setRegValue(address, f);
         }
         register.checkZeroBit(f);
         register.incPC();
@@ -259,11 +267,11 @@ public class Operations {
      */
     public void movwf_nop(int instruction) {
         System.out.println("movwf_nop with: " + instruction);
-        if ((instruction & 0x0080) == 1) {
+        if ((instruction & 0x0080) == 0x0080) {
             System.out.println("movwf");
             int address = instruction & 0x007F;
             int value = register.getW();
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         register.incPC();
         register.incCycles();
@@ -284,13 +292,13 @@ public class Operations {
         // Carrybit auslesen
         int c = (register.getRegValue(Register.STATUS)) & 0x01;
         // neues Carrybit setzen
-        register.write(Register.STATUS, (f >>> 7) & 0x0001);
+        register.setRegValue(Register.STATUS, (f >>> 7) & 0x0001);
         // nach links shiften und c anhängen
         int value = (f << 1) | c;
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         register.incPC();
         register.incCycles();
@@ -311,14 +319,14 @@ public class Operations {
         // aktuelles Carrybit speichern
         int c = (register.getRegValue(Register.STATUS)) & 0x01;
         // neues Carrybit setzen
-        register.write(Register.STATUS, (f >>> 0) & 0x0001);
+        register.setRegValue(Register.STATUS, (f >>> 0) & 0x0001);
         // nach links shiften und c um 7 stellen nach rechts geshiftet anhängen
         int value = (f >> 1) | (c << 7);
-        //write to destination
+        //setRegValue to destination
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         register.incPC();
         register.incCycles();
@@ -350,13 +358,13 @@ public class Operations {
             // CarryBit = 1 da Ergebnis 0 oder positiv
             //status = setBitAt(status, 0, 1);
         }
-        register.write(Register.STATUS, status);
+        register.setRegValue(Register.STATUS, status);
         //falls value pos vorzeichen entfernen
         value = value & 0x1FF;
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         register.checkZeroBit(value);
         register.checkDC(f, w, false);
@@ -375,15 +383,13 @@ public class Operations {
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
-        int upper = f & 0x00F0;
-        upper = upper >>> 4;
+        int upperBits = f & 0x00F0;
         int lower = f & 0x000F;
-        lower = lower + 15;
-        int value = lower | upper;
+        int value = ((lower << 4) + (upperBits >> 4));
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         register.incPC();
         register.incCycles();
@@ -406,7 +412,7 @@ public class Operations {
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
-            register.write(address, value);
+            register.setRegValue(address, value);
         }
         register.checkZeroBit(value);
         register.incPC();
@@ -420,20 +426,23 @@ public class Operations {
         System.out.println("bcf with: " + instruction);
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
-        int pos = instruction & 0x0380;
-        int value = f | (0 << pos);
-        register.write(address, value);
+        int pos = ((instruction & 0x0380) >> 7);
+        int value = f & ~(1 << pos);
+        register.setRegValue(address, value);
         register.incPC();
         register.incCycles();
     }
 
+    /*
+     *Bit 'b' in register 'f' is set.
+     */
     public void bsf(int instruction) {
         System.out.println("bsf with: " + instruction);
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
-        int pos = instruction & 0x0380;
+        int pos = (instruction & 0x0380) >> 7;
         int value = f | (1 << pos);
-        register.write(address, value);
+        register.setRegValue(address, value);
         register.incPC();
         register.incCycles();
     }
@@ -446,12 +455,28 @@ public class Operations {
         System.out.println("btfss with: " + instruction);
     }
 
+    /*
+     *The contents of the W register are
+     *added to the eight bit literal 'k' and the
+     *result is placed in the W register.
+     */
     public void addlw(int instruction) {
-        register.setW(register.getW() + (instruction & 0x00FF));
+        //Maskieren
+        int value = instruction & 0x00FF;
+        //Werte addieren
+        register.setW(register.getW() + value);
     }
 
+    /*
+     *The contents of W register are
+     *AND’ed with the eight bit literal 'k'.The
+     *result is placed in the W register.
+     */
     public void andlw(int instruction) {
-        register.setW(register.getW() & (instruction & 0x00FF));
+        //Maskieren
+        int value = instruction & 0x00FF;
+        //Werte ver'UND'en
+        register.setW(register.getW() & value);
     }
 
     public void call(int instruction) {

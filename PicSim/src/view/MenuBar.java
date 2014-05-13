@@ -22,10 +22,14 @@ public class MenuBar{
 
     //private Register register = new Register();
     private Converter convert = new Converter();
-    private Scan scanner = new Scan();
-    private Pars parser = new Pars();
+    private Scan scanner;
+    private Pars parser;
     private Path pathToSource;
 
+    public MenuBar(Pars parser, Scan scanner) {
+        this.parser = parser;
+        this.scanner = scanner;
+    }
 
     public void oeffnen() throws IOException {
         // JFileChooser-Objekt erstellen

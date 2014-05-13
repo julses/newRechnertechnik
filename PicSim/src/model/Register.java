@@ -43,10 +43,6 @@ public class Register {
     private int[] reg;
 
     public Register() {
-        init();
-    }
-
-    private void init() {
         cycles = 0;
         reg = new int[0xFF];
         valueOnReset();
@@ -58,26 +54,26 @@ public class Register {
         w = 0;
         //Register Reset
         reg = new int[0xFF];
-        System.out.println("RegisterArray erstellt, Wert von PCL: " + reg[PCL]);
+        //System.out.println("RegisterArray erstellt, Wert von PCL: " + reg[PCL]);
         // Bank 0
-        write(PCL, 0x00);
-        write(STATUS, 0x18);
-        write(PCLATH, 0x00);
-        write(INTCON, 0x00);
+        setRegValue(PCL, 0x00);
+        setRegValue(STATUS, 0x18);
+        setRegValue(PCLATH, 0x00);
+        setRegValue(INTCON, 0x00);
 
         // Bank 1
-        write(OPTION_REG, 0xFF);
-        write(PCL + OFFSET, 0x00);
-        write(STATUS + OFFSET, 0x18);
-        write(TRISA, 0x1F);
-        write(TRISB, 0xFF);
-        write(EECON1, 0x00);
-        write(PCLATH + OFFSET, 0x00);
-        write(INTCON + OFFSET, 0x00);
+        setRegValue(OPTION_REG, 0xFF);
+        setRegValue(PCL + OFFSET, 0x00);
+        setRegValue(STATUS + OFFSET, 0x18);
+        setRegValue(TRISA, 0x1F);
+        setRegValue(TRISB, 0xFF);
+        setRegValue(EECON1, 0x00);
+        setRegValue(PCLATH + OFFSET, 0x00);
+        setRegValue(INTCON + OFFSET, 0x00);
     }
 
     //Schreibt in Adresse des Registers
-    public void write(int addr, int value) {
+    public void setRegValue(int addr, int value) {
         //Adressüberprüfung
         if (addr > REG_MAX) {
             System.out.println("Ungültige Adresse: " + addr);
@@ -99,9 +95,9 @@ public class Register {
 
     public void setPC(int pc) {
         //Oberen 5 bit im PCLATH speichern
-        write(PCLATH, (pc & 0x1F00) >> 8); //0b0001 1111 0000 0000
+        setRegValue(PCLATH, (pc & 0x1F00) >> 8); //0b0001 1111 0000 0000
         //Unteren 8 bit im PCL speichern
-        write(PCL, pc & 0x00FF);    //0b0000 0000 1111 1111
+        setRegValue(PCL, pc & 0x00FF);    //0b0000 0000 1111 1111
     }
 
     public void incPC() {
@@ -128,11 +124,11 @@ public class Register {
         //If add=true -> Addition
         if (add) {
             if((value & 0x000F) + value2 > 0x000F){
-                    write(STATUS, 0x0002);
+                    setRegValue(STATUS, 0x0002);
             }
         } else {
             if((value & 0x000F) - value2 < 0){
-                write(STATUS, 0x0002);
+                setRegValue(STATUS, 0x0002);
             }
         }
     }
@@ -143,16 +139,18 @@ public class Register {
         int status = getRegValue(STATUS);
         if (add) {
             if(value + w > 0x00FF){
-                write(STATUS, status | (1<<0));
-                return ((value + w) - 0x00FF);
+                setRegValue(STATUS, status | (1 << 0));
             }
+                return ((value + w) - 0x00FF);
+
         } else {
             if(value - w < 0){
-                write(STATUS, status | (1<<0));
-                return (value - w) + 0x00FF;
+                setRegValue(STATUS, status | (1 << 0));
             }
+                return (value - w) + 0x00FF;
+
         }
-        throw new IllegalCarryOperationException(f, w);
+        //throw new IllegalCarryOperationException(f, w);
     }
 
     public void incCycles() {
@@ -160,7 +158,16 @@ public class Register {
     }
 
     public void checkZeroBit(int value) {
-        int status = getRegValue(STATUS);
-        if (value == 0) write(STATUS, (status | (1 << 2)));
+        if (value == 0){
+            int status = getRegValue(STATUS);
+            status = status | (1 << 2);
+            setRegValue(STATUS, status);
+        }
+    }
+
+    public boolean getZeroBit() {
+        int status = getRegValue(STATUS) & 1<<2;
+        if (status==4) return true;
+        else return false;
     }
 }

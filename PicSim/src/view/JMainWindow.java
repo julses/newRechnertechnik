@@ -20,8 +20,9 @@ import java.io.IOException;
  */
 
 public class JMainWindow implements ActionListener {
-    MenuBar MenuBar = new MenuBar();
+
     private Scan scanner;
+    private MenuBar menuBar;
 
     JFrame hauptFenster;
     Container container;
@@ -48,7 +49,8 @@ public class JMainWindow implements ActionListener {
     // Textfeld
     JTextArea textarea;
 
-    public JMainWindow() {
+    public JMainWindow(MenuBar menubar) {
+        this.menuBar = menubar;
         hauptFenster = new JFrame("PicSim 0.0.1");
         container = hauptFenster.getContentPane();
         container.setLayout(new BorderLayout());
@@ -139,7 +141,7 @@ public class JMainWindow implements ActionListener {
 
     public void actionPerformed(ActionEvent object) {
             if (object.getSource() == stepButton) try {
-                MenuBar.step();
+                menuBar.step();
             } catch (NoInstructionException e) {
                 e.printStackTrace();
             } catch (IllegalCarryOperationException e) {
@@ -150,7 +152,7 @@ public class JMainWindow implements ActionListener {
 
         if (object.getSource() == oeffnen) {
                 try {
-                    MenuBar.oeffnen();
+                    menuBar.oeffnen();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -160,7 +162,7 @@ public class JMainWindow implements ActionListener {
             }
             if (object.getSource() == step) {
                 try {
-                    MenuBar.step();
+                    menuBar.step();
                 } catch (NoInstructionException e) {
                     e.printStackTrace();
                 } catch (IllegalCarryOperationException e) {
@@ -174,7 +176,7 @@ public class JMainWindow implements ActionListener {
                 System.out.println("doku wurde angeklickt");
             }
             if (object.getSource() == about) {
-                MenuBar.ueber();
+                menuBar.ueber();
             }
         }
 

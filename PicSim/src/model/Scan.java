@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,16 +22,18 @@ import model.Converter;
 public class Scan {
 
     private Converter convert = new Converter();
+    private List<String> binaryCode;
+    private List<String> hexCode;
+    private Iterator<String> iterator;
     private final String DELIM = "([0-9]|[A-F])+([0-9]|[A-F])*";
     private final Pattern PATTERN = Pattern.compile(DELIM);
     private Matcher matcher;
     private Path pathToLSTFile;
 
-
-    public Scan() {
-        //To change body of created methods use File | Settings | File Templates.
+    public Scan(List<String> binaryCode, List<String> hexCode) {
+        this.binaryCode = binaryCode;
+        this.hexCode = hexCode;
     }
-
 
     public void setPathToLSTFile(Path pathToLSTFile) {
         this.pathToLSTFile = pathToLSTFile;
@@ -52,16 +55,16 @@ public class Scan {
                 /* String val = "0x";
                  * val += zeile;
                  */
-                PicSim.hexCode.add(zeile);
-                PicSim.binaryCode.add(convert.hexStringToBinString(zeile));           //binaryCode binär
-                for (int j = 0; j < PicSim.binaryCode.size(); j++) {
-                    if (zeile.length() < 4) PicSim.binaryCode.set(j, "Fehler");
+                hexCode.add(zeile);
+                binaryCode.add(convert.hexStringToBinString(zeile));           //binaryCode binär
+                for (int j = 0; j < binaryCode.size(); j++) {
+                    if (zeile.length() < 4) binaryCode.set(j, "Fehler");
                 }
             }
         }
-        dotxt(PicSim.hexCode, "HexCodeBefehle");
-        dotxt(PicSim.binaryCode, "BinärCodeBefehle");
-        PicSim.iterator = PicSim.hexCode.iterator();
+        dotxt(hexCode, "HexCodeBefehle");
+        dotxt(binaryCode, "BinärCodeBefehle");
+        iterator = hexCode.iterator();
         br.close();
     }
 
@@ -100,8 +103,8 @@ public class Scan {
 
     public String getOperation(){
         //Test welche Binärzahlen in Liste stehen
-        if(PicSim.iterator.hasNext()){
-            return PicSim.iterator.next();
+        if(iterator.hasNext()){
+            return iterator.next();
         }else{
             System.out.println("Kein Befehl mehr vorhanden!");
             return null;

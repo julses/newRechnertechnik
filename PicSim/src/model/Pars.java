@@ -58,9 +58,10 @@ public class Pars {
     public static final int TOK_SUBLW = 0x3C00;
     public static final int TOK_XORLW = 0x3A00;
 
-    private Operations oper = new Operations();
+    private Operations oper;
 
-    public Pars() {
+    public Pars(Operations operations) {
+        this.oper = operations;
     }
 
     //Instruction decodieren
