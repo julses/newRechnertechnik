@@ -26,6 +26,8 @@ public class JMainWindow implements ActionListener {
 
     private MenuBar menuBar;
 
+    Timer timer;
+
     String[][] rowData;
 
     String[] columnNames;
@@ -102,8 +104,19 @@ public class JMainWindow implements ActionListener {
     JLabel labelacc;
     JLabel labelwreg;
 
+    class StartListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            timer.start();
+        }
+    }
 
-    public JMainWindow(MenuBar menuBar) {
+    class StopListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            timer.stop();
+        }
+    }
+
+    public JMainWindow(final MenuBar menuBar) {
         this.menuBar = menuBar;
         hauptFenster = new JFrame("PicSim 0.0.1");
         container = hauptFenster.getContentPane();
@@ -177,6 +190,19 @@ public class JMainWindow implements ActionListener {
         hauptFenster.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //hauptFenster.pack();//Passt Buttons an
         hauptFenster.setVisible(true);
+
+        timer = new Timer(500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                try {
+                    menuBar.step();
+                } catch (NoInstructionException e) {
+                    e.printStackTrace();
+                } catch (NoRegisterAddressException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void JMenuBar() {
@@ -190,21 +216,24 @@ public class JMainWindow implements ActionListener {
            }
         });
         runButton = new JButton("Run");
-        runButton.setVisible(true);
-        runButton.addMouseListener(new MouseAdapter() {
+        //runButton.setVisible(true);
+        runButton.addActionListener(new StartListener());
+        /*runButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mousePressed(e);
             }
-        });
+        });*/
         stopButton = new JButton("Stop");
-        stopButton.setVisible(true);
+        //stopButton.setVisible(true);
+        stopButton.addActionListener(new StopListener());
+        /*
         stopButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mousePressed(e);
             }
-        });
+        }); */
 
         // Menüleiste erzeugen
         menueLeiste = new JMenuBar();

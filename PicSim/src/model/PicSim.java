@@ -4,9 +4,6 @@ import view.JMainWindow;
 import view.MenuBar;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,7 +14,6 @@ import java.util.List;
  */
 public class PicSim {
 
-    //private static List<String> binaryCode;  // Binärcode Liste
     private static Register register;
     private static Operations operations;
     private static Interrupts interrupts;
@@ -27,7 +23,6 @@ public class PicSim {
 
 
     public static void main(String[] args) throws IOException {
-        //binaryCode = new ArrayList<String>();
         register = new Register();
         operations = new Operations(register);
         interrupts = new Interrupts(register);
