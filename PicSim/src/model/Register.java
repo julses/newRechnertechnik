@@ -55,25 +55,25 @@ public class Register {
     //Power On Reset bei laden einer Datei
     public void valueOnReset(){
         try {
-        w = 0;
-        //Register Reset
-        reg = new int[0xFF];
-        System.out.println("RegisterArray erstellt, Wert von PCL: " + reg[PCL]);
-        // Bank 0
-        setRegValue(PCL, 0x00);
-        setRegValue(STATUS, 0x18);
-        setRegValue(PCLATH, 0x00);
-        setRegValue(INTCON, 0x00);
+            w = 0;
+            //Register Reset
+            reg = new int[0xFF];
+            System.out.println("RegisterArray erstellt, Wert von PCL: " + reg[PCL]);
+            // Bank 0
+            setRegValue(PCL, 0x00);
+            setRegValue(STATUS, 0x18);
+            setRegValue(PCLATH, 0x00);
+            setRegValue(INTCON, 0x00);
 
-        // Bank 1
-        setRegValue(OPTION_REG, 0xFF);
-        setRegValue(PCL + OFFSET, 0x00);
-        setRegValue(STATUS + OFFSET, 0x18);
-        setRegValue(TRISA, 0x1F);
-        setRegValue(TRISB, 0xFF);
-        setRegValue(EECON1, 0x00);
-        setRegValue(PCLATH + OFFSET, 0x00);
-        setRegValue(INTCON + OFFSET, 0x00);
+            // Bank 1
+            setRegValue(OPTION_REG, 0xFF);
+            setRegValue(PCL + OFFSET, 0x00);
+            setRegValue(STATUS + OFFSET, 0x18);
+            setRegValue(TRISA, 0x1F);
+            setRegValue(TRISB, 0xFF);
+            setRegValue(EECON1, 0x00);
+            setRegValue(PCLATH + OFFSET, 0x00);
+            setRegValue(INTCON + OFFSET, 0x00);
         } catch (NoRegisterAddressException e) {
             e.printStackTrace();
         }

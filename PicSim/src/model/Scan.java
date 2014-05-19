@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -31,9 +32,8 @@ public class Scan {
     private Matcher matcher;
     private Path pathToLSTFile;
 
-    public Scan(List<String> hexCode, Register register) {
+    public Scan(Register register) {
         //this.binaryCode = binaryCode;
-        this.hexCode = hexCode;
         this.register = register;
     }
 
@@ -43,6 +43,8 @@ public class Scan {
 
 
     public void reader() throws IOException {
+        hexCode = new ArrayList<String>();
+        register.valueOnReset();
         FileReader fr = new FileReader(String.valueOf(pathToLSTFile));
         BufferedReader br = new BufferedReader(fr);
 

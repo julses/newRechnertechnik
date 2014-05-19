@@ -99,6 +99,7 @@ public class Operations {
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
         int value = (~f & 0xFF);
+        System.out.println("comf value = " + value);
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
@@ -120,6 +121,7 @@ public class Operations {
         System.out.println("decf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
+        System.out.println("Addresse: " + Integer.toHexString(address));
         int f = register.getRegValue(address);
         int value = --f;
         //Wert auf MAX wenn Wert negativ -> "Unterlauf"

@@ -173,7 +173,7 @@ public class JMainWindow implements ActionListener {
 
         //labelpcl.setLabelFor(pcl);
         //Hauptfenster mit Attributen ausstatten
-        hauptFenster.setSize(1024, 768);
+        hauptFenster.setSize(1024, 620);
         hauptFenster.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //hauptFenster.pack();//Passt Buttons an
         hauptFenster.setVisible(true);
@@ -254,13 +254,16 @@ public class JMainWindow implements ActionListener {
             } catch (NoRegisterAddressException e) {
                 e.printStackTrace();
             }
-        if (object.getSource() == runButton) System.out.println("runButton pressed");
-        if (object.getSource() == stopButton) System.out.println("stopButton pressed");
+        if (object.getSource() == runButton) {
+
+        }
+        if (object.getSource() == stopButton) {
+            System.out.println("stopButton pressed");
+        }
 
         if (object.getSource() == oeffnen) {
             try {
                 menuBar.oeffnen();
-                //TODO Funktion Reader aus Scan nutzen
                 FileReader fr = new FileReader(String.valueOf(menuBar.pathToSource));
                 BufferedReader br = new BufferedReader(fr);
 
@@ -272,7 +275,6 @@ public class JMainWindow implements ActionListener {
                 }
 
                 br.close();
-
 
             } catch (IOException e) {
                 e.printStackTrace();
