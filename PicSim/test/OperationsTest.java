@@ -4,7 +4,6 @@ import model.Register;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static java.lang.Thread.sleep;
 
 /**
  * Created with IntelliJ IDEA.
@@ -82,12 +81,31 @@ public class OperationsTest {
         Assert.assertEquals(0x0, register.getRegValue(0xc));
         Assert.assertTrue(register.getZeroBit());
     }
-/*
+
     @org.junit.Test
     public void testDecfsz() throws Exception {
-
+        int instruction = 0x0B8c;
+        //Wert von 'f' decrementieren und in 'f' speichern, NOP() ausführen
+        register.setRegValue(0xc, 0x1);
+        register.setW(0x3);
+        int opcode = pars.decode(instruction);
+        pars.exec(instruction, opcode);
+        Assert.assertEquals(0x0, register.getRegValue(0xc));
+        Assert.assertEquals(0x3, register.getW());
+        Assert.assertEquals(2, register.getPC());
+        //Wert von 'f' decrementieren und in 'f' speichern, unterlauf simmulieren, NOP nicht ausführen
+        pars.exec(instruction, opcode);
+        Assert.assertEquals(0xFF, register.getRegValue(0xc));
+        Assert.assertEquals(0x3, register.getW());
+        Assert.assertEquals(3, register.getPC());
+        //Wert von 'f' decrementieren und in 'w' speichern, NOP() nicht ausführen
+        instruction = 0x0B0C;
+        pars.exec(instruction, opcode);
+        Assert.assertEquals(0xFF, register.getRegValue(0xc));
+        Assert.assertEquals(0xFE, register.getW());
+        Assert.assertEquals(4, register.getPC());
     }
-*/
+
     @Test
     public void testIncf() throws Exception {
         int instruction = 0x0a8e;
@@ -99,12 +117,31 @@ public class OperationsTest {
         //Zero Bit affected?
         Assert.assertTrue(register.getZeroBit());
     }
-/*
+
     @org.junit.Test
     public void testIncfsz() throws Exception {
-
+        int instruction = 0x0F8c;
+        //Wert von 'f' incrementieren und in 'f' speichern, überlauf simulieren, NOP() ausführen
+        register.setRegValue(0xc, 0xFF);
+        register.setW(0x3);
+        int opcode = pars.decode(instruction);
+        pars.exec(instruction, opcode);
+        Assert.assertEquals(0x0, register.getRegValue(0xc));
+        Assert.assertEquals(0x3, register.getW());
+        Assert.assertEquals(2, register.getPC());
+        //Wert von 'f' decrementieren und in 'f' speichern, NOP nicht ausführen
+        pars.exec(instruction, opcode);
+        Assert.assertEquals(0x1, register.getRegValue(0xc));
+        Assert.assertEquals(0x3, register.getW());
+        Assert.assertEquals(0x3, register.getPC());
+        //Wert von 'f' decrementieren und in 'w' speichern, NOP() nicht ausführen
+        instruction = 0x0F0C;
+        pars.exec(instruction, opcode);
+        Assert.assertEquals(0x1, register.getRegValue(0xc));
+        Assert.assertEquals(0x2, register.getW());
+        Assert.assertEquals(4, register.getPC());
     }
-
+/*
     @org.junit.Test
     public void testIorwf() throws Exception {
 
@@ -119,7 +156,7 @@ public class OperationsTest {
         Assert.assertEquals(0x0, register.getRegValue(Register.FSR));
         Assert.assertTrue(register.getZeroBit());
     }
-/*
+
     @org.junit.Test
     public void testMovwf() throws Exception {
     //TODO : Problem with decoding addresses of Bank 1
@@ -130,17 +167,22 @@ public class OperationsTest {
         pars.exec(instruction, opcode);
         Assert.assertEquals(0x4F, register.getRegValue(Register.OPTION_REG));
     }
-*/
+
     @Test
     public void testRlf() throws Exception {
+        /*Case 1:
+         * Before Instruction        After Instruction
+         * REG1 = 1110 0110          REG1 = 1110 0110
+         * C = 0                     W = 1100 1100
+         *                           C = 1
+         */
         int instruction = 0x0d50;
         register.setRegValue(0x50, 0xe6);
         int opcode = pars.decode(instruction);
         pars.exec(instruction, opcode);
         Assert.assertEquals(0xe6, register.getRegValue(0x50));
         Assert.assertEquals(0xcc, register.getW());
-        //TODO : CarryBit überarbeiten
-        //Assert.assertEquals(1 , (Register.STATUS & 0x0004));
+        Assert.assertTrue(register.testBit(register.getRegValue(Register.STATUS), 0));
     }
 
     @Test
@@ -151,8 +193,7 @@ public class OperationsTest {
         pars.exec(instruction, opcode);
         Assert.assertEquals(0xe6, register.getRegValue(0x51));
         Assert.assertEquals(0x73, register.getW());
-        //TODO : CarryBit überarbeiten
-        //Assert.assertEquals(1 , (Register.STATUS & 0x0004));
+        Assert.assertFalse(register.testBit(register.getRegValue(Register.STATUS), 0));
     }
 
     @Test
@@ -160,7 +201,7 @@ public class OperationsTest {
         int instruction;
         int addressf = 0x52;
 
-        /*Example 1
+        /*Case 1
          * Before Instruction       After Instruction
          * REG1 = 3                 REG1 = 1
          * W = 2                    W = 2
@@ -174,11 +215,10 @@ public class OperationsTest {
         pars.exec(instruction, pars.decode(instruction));
         Assert.assertEquals(0x01, register.getRegValue(addressf));
         Assert.assertEquals(0x02, register.getW());
-        //TODO : CarryBit überarbeiten
-        //Assert.assertEquals(1 , (Register.STATUS & 0x0004));
+        Assert.assertEquals(1 , (Register.STATUS & 0x0001));
         Assert.assertFalse(register.getZeroBit());
 
-        /*Example 2:
+        /*Case 2:
          * Before Instruction       After Instruction
          * REG1 = 2                 REG1 = 0
          * W = 2                    W = 2
@@ -187,16 +227,15 @@ public class OperationsTest {
          */
         register.valueOnReset();
         instruction = 0x02d2;
-        register.setRegValue(addressf, 2);
-        register.setW(2);
+        register.setRegValue(addressf, 2);  //REG1 = 2
+        register.setW(2);                   //W = 2
         pars.exec(instruction, pars.decode(instruction));
         Assert.assertEquals(0, register.getRegValue(addressf));
         Assert.assertEquals(2, register.getW());
-        //TODO : CarryBit überarbeiten
-        //Assert.assertEquals(1 , (Register.STATUS & 0x0004));
+        Assert.assertEquals(1 , (Register.STATUS & 0x0001));
         Assert.assertTrue(register.getZeroBit());
 
-        /*Example 3:
+        /*Case 3:
          * Before Instruction       After Instruction
          * REG1 = 1                 REG1 = 0xFF
          * W = 2                    W = 2
@@ -210,17 +249,27 @@ public class OperationsTest {
         pars.exec(instruction, pars.decode(instruction));
         Assert.assertEquals(0xFF, register.getRegValue(addressf));
         Assert.assertEquals(2, register.getW());
-        //TODO : CarryBit überarbeiten
-        //Assert.assertEquals(1 , (Register.STATUS & 0x0004));
+        Assert.assertEquals(1 , (Register.STATUS & 0x0001));
         Assert.assertFalse(register.getZeroBit());
     }
 
     @Test
     public void testSwapf() throws Exception {
+        /*Case 1:
+         * Before Instruction:      After Instruction:
+         * REG1 = 0xA5              REG1 = 0xA5
+         *                          W = 0x5A
+         */
         register.setRegValue(0x53, 0xA5);
         pars.exec(0x0e53, pars.decode(0x0e53));
         Assert.assertEquals(0xA5, register.getRegValue(0x53));
         Assert.assertEquals(0x5A, register.getW());
+        /*Case 2:
+         * Before Instruction:      After Instruction:
+         * REG1 = 0xA5              REG1 = 0x5A
+         */
+        pars.exec(0x0ed3, pars.decode(0x0ed3));
+        Assert.assertEquals(0x5A, register.getRegValue(0x53));
     }
 
     @Test
@@ -245,17 +294,31 @@ public class OperationsTest {
         pars.exec(0x17d5, pars.decode(0x17d5));
         Assert.assertEquals(0x8A, register.getRegValue(0x55));
     }
-/*
+
     @org.junit.Test
     public void testBtfsc() throws Exception {
-
+        //Kein NOP() ausführen
+        register.setRegValue(0x56, 0xFF);
+        pars.exec(0x18D6, pars.decode(0x18D6));
+        Assert.assertEquals(1, register.getPC());
+        //NOP() ausführen
+        register.setRegValue(0x56, 0x00);
+        pars.exec(0x18D6, pars.decode(0x18D6));
+        Assert.assertEquals(3, register.getPC());
     }
 
     @org.junit.Test
     public void testBtfss() throws Exception {
-
+        //NOP() ausführen
+        register.setRegValue(0x57, 0xFF);
+        pars.exec(0x1FD7, pars.decode(0x1FD7));
+        Assert.assertEquals(2, register.getPC());
+        //Kein NOP() ausführen
+        register.setRegValue(0x57, 0x00);
+        pars.exec(0x1DD7, pars.decode(0x1DD7));
+        Assert.assertEquals(3, register.getPC());
     }
-*/
+
     @Test
     public void testAddlw() throws Exception {
         register.setW(0x10);
@@ -285,14 +348,16 @@ public class OperationsTest {
         register.setW(0x9A);
         pars.exec(0x3835, pars.decode(0x3835));
         Assert.assertEquals(0xBF, register.getW());
-        Assert.assertTrue(register.getZeroBit());
+        // TODO : Why has the Bit to be true? - Example is from PIC-Manual
+        //Assert.assertTrue(register.getZeroBit());
+    }
+
+    @Test
+    public void testMovlw() throws Exception {
+        pars.exec(0x305A, pars.decode(0x305A));
+        Assert.assertEquals(0x5A, register.getW());
     }
 /*
-    @org.junit.Test
-    public void testMovlw() throws Exception {
-
-    }
-
     @org.junit.Test
     public void testRetlw() throws Exception {
 
@@ -300,7 +365,31 @@ public class OperationsTest {
 
     @org.junit.Test
     public void testSublw() throws Exception {
+        /*
+         *Case 1:
+         * Before Instruction       After Instruction
+         * W = 1                    W = 1
+         * C = ?                    C = 1; result is positive
+         * Z = ?                    Z = 0
+         */
 
+        /*
+         *Case 2:
+         * Before Instruction       After Instruction
+         * W = 2                    W = 0
+         * C = ?                    C = 1; result is zero
+         * Z = ?                    Z = 1
+         */
+
+
+        /*
+         *Case 3:
+         * Before Instruction       After Instruction
+         * W = 3                    W = 0xFF
+         * C = ?                    C = 0; result is negative
+         * Z = ?                    Z = 0
+         */
+/*
     }
 
     @org.junit.Test
@@ -327,5 +416,5 @@ public class OperationsTest {
     public void testSleep() throws Exception {
 
     }
-    */
+*/
 }

@@ -1,10 +1,9 @@
 package view;
 
-import exceptions.IllegalCarryOperationException;
 import exceptions.NoInstructionException;
+import exceptions.NoRegisterAddressException;
 import model.Converter;
 import model.Pars;
-import model.Register;
 import model.Scan;
 
 import javax.swing.*;
@@ -24,7 +23,7 @@ public class MenuBar{
     private Converter convert = new Converter();
     private Scan scanner;
     private Pars parser;
-    private Path pathToSource;
+    public Path pathToSource;
 
     public MenuBar(Pars parser, Scan scanner) {
         this.parser = parser;
@@ -67,10 +66,10 @@ public class MenuBar{
         fenster.setVisible(true);
     }
 
-    public void step() throws NoInstructionException, IllegalCarryOperationException {
+    public void step() throws NoInstructionException, NoRegisterAddressException {
         //TODO : Interrupts
         //Befehlsstring laden
-        String stringopcode = scanner.getOperation();
+        String stringopcode = scanner.getOper();
         //System.out.println(stringopcode);
         //String in integer Umwandeln
         int instruction = convert.hexStringToInt(stringopcode);

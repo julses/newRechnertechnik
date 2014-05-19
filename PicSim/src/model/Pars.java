@@ -1,7 +1,7 @@
 package model;
 
-import exceptions.IllegalCarryOperationException;
 import exceptions.NoInstructionException;
+import exceptions.NoRegisterAddressException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -113,7 +113,7 @@ public class Pars {
 
 
     //Befehlszuweisung
-    public void exec(int instruction, int opcode) throws IllegalCarryOperationException {
+    public void exec(int instruction, int opcode) throws NoRegisterAddressException {
         switch (opcode) {
             case TOK_ADDWF:
                 oper.addwf(instruction);

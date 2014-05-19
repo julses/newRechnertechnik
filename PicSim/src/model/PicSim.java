@@ -18,9 +18,10 @@ import java.util.List;
 public class PicSim {
 
     private static List<String> hexCode;     // Hexcode Liste
-    private static List<String> binaryCode;  // Binärcode Liste
+    //private static List<String> binaryCode;  // Binärcode Liste
     private static Register register;
     private static Operations operations;
+    private static Interrupts interrupts;
     private static Scan scanner;
     private static Pars parser;
     private static MenuBar menubar;
@@ -28,10 +29,11 @@ public class PicSim {
 
     public static void main(String[] args) throws IOException {
         hexCode = new ArrayList<String>();
-        binaryCode = new ArrayList<String>();
+        //binaryCode = new ArrayList<String>();
         register = new Register();
         operations = new Operations(register);
-        scanner = new Scan(binaryCode, hexCode);
+        interrupts = new Interrupts(register);
+        scanner = new Scan(hexCode, register);
         parser = new Pars(operations);
         menubar = new MenuBar(parser, scanner);
         new JMainWindow(menubar);

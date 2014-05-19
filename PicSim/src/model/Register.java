@@ -1,6 +1,7 @@
 package model;
 
-import exceptions.IllegalCarryOperationException;
+
+import exceptions.NoRegisterAddressException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,20 +42,23 @@ public class Register {
     private int cycles;
     private int w; //W-Register
     private int[] reg;
+    private int latchPortA;
+    private int latchPortB;
 
     public Register() {
         cycles = 0;
         reg = new int[0xFF];
+
         valueOnReset();
     }
 
-
     //Power On Reset bei laden einer Datei
     public void valueOnReset(){
+        try {
         w = 0;
         //Register Reset
         reg = new int[0xFF];
-        //System.out.println("RegisterArray erstellt, Wert von PCL: " + reg[PCL]);
+        System.out.println("RegisterArray erstellt, Wert von PCL: " + reg[PCL]);
         // Bank 0
         setRegValue(PCL, 0x00);
         setRegValue(STATUS, 0x18);
@@ -70,15 +74,42 @@ public class Register {
         setRegValue(EECON1, 0x00);
         setRegValue(PCLATH + OFFSET, 0x00);
         setRegValue(INTCON + OFFSET, 0x00);
+        } catch (NoRegisterAddressException e) {
+            e.printStackTrace();
+        }
     }
 
     //Schreibt in Adresse des Registers
-    public void setRegValue(int addr, int value) {
+    public void setRegValue(int address, int value) throws NoRegisterAddressException{
         //Adressüberprüfung
-        if (addr > REG_MAX) {
-            System.out.println("Ungültige Adresse: " + addr);
+        if (address > REG_MAX) {
+            throw new NoRegisterAddressException(address);
         }
-        reg[addr] = value;
+
+        if (isGPRAddr(address)) {
+            //writeGPR(address, value);
+        } else {
+            writeSFR(address, value);
+        }
+    }
+
+
+    public void writeThough(int addr, int value) throws NoRegisterAddressException {
+        switch (addr) {
+            case PORTA:
+                reg[PORTA] = value;
+                latchPortA = value;
+                //TODO : Ausgabe
+                break;
+
+            case PORTB:
+                reg[PORTB] = value;
+                latchPortB = value;
+                //TODO : Ausgabe
+                break;
+            default:
+                setRegValue(addr, value);
+        }
     }
 
     //Überprüft ob es sich um GPR (General Purpose Registers) Adresse handelt
@@ -89,19 +120,109 @@ public class Register {
         return false;
     }
 
+    private void writeSFR(int addr, int value) {
+        // Bank auswählen
+        addr = selectBank(addr);
+        // Wert schreiben
+        switch (addr) {
+            //INDF spiegeln
+            case INDF:
+            case INDF + OFFSET:
+                //indirekte Adressierung
+                //TODO : GPR Addressen schreiben
+                //writeGPR(reg[FSR], value);
+                break;
+
+            //PCL spiegeln
+            case PCL:
+            case PCL + OFFSET:
+                reg[PCL] = value;
+                reg[PCL + OFFSET] = value;
+                break;
+
+            //STATUS spiegeln
+            case STATUS:
+            case STATUS + OFFSET:
+                //value = value & 0xE7; //0b1110 0111 --> TO & PD nur lesbar
+                reg[STATUS] = value;
+                reg[STATUS + OFFSET] = value;
+                break;
+
+            //FSR spiegeln
+            case FSR:
+            case FSR + OFFSET:
+                reg[FSR] = value;
+                reg[FSR + OFFSET] = value;
+                break;
+
+            //PORT A Ausgänge schreiben (TRIS A Reg = 0 --> ausgang)
+            case PORTA:
+                latchPortA = value;
+                reg[PORTA] = (value & 0x1F) & ~reg[TRISA];
+                break;
+
+            //PORT B Ausgänge schreiben (TRIS B Reg = 0 --> ausgang)
+            case PORTB:
+                latchPortB = value;
+                reg[PORTB] = value & ~reg[TRISB];
+                break;
+
+            case TRISA:
+                value = value & 0x1F;
+                reg[TRISA] = value;
+                reg[PORTA] = latchPortA & ~reg[TRISA];
+                //TODO : GUI benachrichtigen
+                break;
+
+            case TRISB:
+                reg[TRISB] = value;
+                reg[PORTB] = latchPortB & ~reg[TRISB];
+                //TODO : GUI benachrichtigen
+                break;
+
+            //PCLATH spiegeln
+            case PCLATH:
+            case PCLATH + OFFSET:
+                reg[PCLATH] = value;
+                reg[PCLATH + OFFSET] = value;
+                break;
+
+            //INTCON spiegeln
+            case INTCON:
+            case INTCON + OFFSET:
+                reg[INTCON] = value;
+                reg[INTCON + OFFSET] = value;
+                break;
+
+            default:
+                //nicht spiegeln
+                reg[addr] = value;
+        }
+        //TODO : GUI benachrichtigen
+    }
+
+    //Addresse an gewählte Bank anpassen
+    private int selectBank(int address) {
+        int bankMask = ((reg[STATUS] & 0x20) << 2);
+        return bankMask | address;
+    }
+
+    //Gibt den PC zurück
     public int getPC() {
         return (reg[PCLATH] << 8) + reg[PCL];
     }
 
-    public void setPC(int pc) {
+    //Setzt den PC auf übergebenen Wert
+    public void setPC(int pc) throws NoRegisterAddressException {
         //Oberen 5 bit im PCLATH speichern
-        setRegValue(PCLATH, (pc & 0x1F00) >> 8); //0b0001 1111 0000 0000
+        setRegValue(PCLATH, (pc & 0x1F00) >> 8); //0b0001 1111 0000 0000 >> 0b0000 0000 0001 1111
         //Unteren 8 bit im PCL speichern
         setRegValue(PCL, pc & 0x00FF);    //0b0000 0000 1111 1111
     }
 
-    public void incPC() {
-        System.out.println("PC++");
+    //Inkrementiert den PC
+    public void incPC() throws NoRegisterAddressException {
+        //System.out.println("PC++");
         int pc = getPC();
         setPC(++pc);
     }
@@ -116,11 +237,12 @@ public class Register {
         return this.w & 0x00FF;
     }
 
+    //Gibt den Wert einer Addresse zurück
     public int getRegValue(int addr) {
         return reg[addr];
     }
 
-    public void checkDC(int value, int value2, boolean add) {
+    public void checkDC(int value, int value2, boolean add) throws NoRegisterAddressException {
         //If add=true -> Addition
         if (add) {
             if((value & 0x000F) + value2 > 0x000F){
@@ -133,41 +255,62 @@ public class Register {
         }
     }
 
-    public int checkCarry(int f, int w, boolean add) throws IllegalCarryOperationException {
+    //Prüft ob ein Bit Carry vorliegt und setzt je nachdem das Carry Bit
+    public void checkCarry(int f, int w, boolean add) throws NoRegisterAddressException {
         //If add=true -> Addition
-        int value = f & 0x00FF;
         int status = getRegValue(STATUS);
-        if (add) {
-            if(value + w > 0x00FF){
-                setRegValue(STATUS, status | (1 << 0));
+        if (add==true) {
+            if(f + w > 0xFF){
+                setBit(status, 0);
+                setRegValue(STATUS, status);
             }
-                return ((value + w) - 0x00FF);
-
         } else {
-            if(value - w < 0){
-                setRegValue(STATUS, status | (1 << 0));
+            if(f - w < 0){
+                clearBit(status, 0);
+                setRegValue(STATUS, status);
             }
-                return (value - w) + 0x00FF;
-
         }
-        //throw new IllegalCarryOperationException(f, w);
     }
 
+    //Inkrementiert Cycles
     public void incCycles() {
         this.cycles++;
     }
 
-    public void checkZeroBit(int value) {
+    //Testet bei einer Operation ob der Wert 0 ist und setzt je nachdem das Zero Bit
+    public void checkZeroBit(int value) throws NoRegisterAddressException {
+        int status = getRegValue(STATUS);
         if (value == 0){
-            int status = getRegValue(STATUS);
-            status = status | (1 << 2);
-            setRegValue(STATUS, status);
+            status = setBit(status, 2);
+        } else {
+            status = clearBit(status, 2);
         }
+        setRegValue(STATUS, status);
     }
 
+    //Gibt Zero Bit als booleschen Wert zurück
     public boolean getZeroBit() {
-        int status = getRegValue(STATUS) & 1<<2;
-        if (status==4) return true;
-        else return false;
+        return testBit(getRegValue(STATUS), 2);
     }
+
+    //Setzt das Bit auf 1
+    static int setBit( int n, int pos ) {
+        return n | (1 << pos);
+    }
+
+    //Setzt das Bit auf 0
+    static int clearBit(int n, int pos) {
+        return n & ~(1 << pos);
+    }
+
+    //Invertiert das angegebene Bit
+    static int flipBit( int n, int pos ) {
+        return n ^ (1 << pos);
+    }
+
+    //Testet ein Bit und gibt booleschen Wert zurück
+    public boolean testBit(int instruction, int pos) {
+        return (instruction & 1<<pos) != 0;
+    }
+
 }

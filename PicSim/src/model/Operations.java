@@ -1,7 +1,7 @@
 package model;
 
-import exceptions.IllegalCarryOperationException;
 
+import exceptions.NoRegisterAddressException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,11 +11,14 @@ import exceptions.IllegalCarryOperationException;
  * To change this template use File | Settings | File Templates.
  */
 public class Operations {
+
+    private Stack stack;
+
     Register register;
     public Operations(Register register) {
         this.register = register;
+        stack = new Stack();
     }
-
 
 
     /*Add the contents of the W register with
@@ -23,8 +26,8 @@ public class Operations {
      *in the W register. If 'd' is 1 the result is
      *stored back in register 'f'.
      */
-    public void addwf(int instruction) throws IllegalCarryOperationException {
-        System.out.println("addwf with: " + instruction);
+    public void addwf(int instruction) throws NoRegisterAddressException {
+        System.out.println("addwf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -35,8 +38,8 @@ public class Operations {
         } else {
             register.setRegValue(address, value);
         }
-        register.checkDC(f, w, true);
         register.checkCarry(f, w, true);
+        register.checkDC(f, w, true);
         register.checkZeroBit(value);
         register.incPC();
         register.incCycles();
@@ -48,8 +51,8 @@ public class Operations {
      *If 'd' is 1 the result is stored back in
      *register 'f'.
      */
-    public void andwf(int instruction) {
-        System.out.println("andwf with: " + instruction);
+    public void andwf(int instruction) throws NoRegisterAddressException {
+        System.out.println("andwf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -68,7 +71,7 @@ public class Operations {
     /*The contents of register 'f' are cleared
      *if 'd' is 1, else 'W' and the Z bit is set.
      */
-    public void clrf_clrw(int instruction){
+    public void clrf_clrw(int instruction) throws NoRegisterAddressException {
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         if(instruction < 0x007F) {
@@ -90,8 +93,8 @@ public class Operations {
      *W. If 'd' is 1 the result is stored back in
      *register 'f'.
      */
-    public void comf(int instruction){
-        System.out.println("comf with: " + instruction);
+    public void comf(int instruction) throws NoRegisterAddressException {
+        System.out.println("comf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -106,14 +109,15 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *Decrement register ’f’. If ’d’ is 0,
      *the result is stored in the W register.
      *If ’d’ is 1, the result is stored
      *back in register ’f’.
      */
-    public void decf(int instruction) {
-        System.out.println("decf with: " + instruction);
+    public void decf(int instruction) throws NoRegisterAddressException {
+        System.out.println("decf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -130,6 +134,7 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *The contents of register 'f' are decremented.
      *If 'd' is 0 the result is placed in the
@@ -139,8 +144,8 @@ public class Operations {
      *executed. If the result is 0, then a NOP is
      *executed instead making it a 2TCY instruction.
      */
-    public void decfsz(int instruction) {
-        System.out.println("decfsz with: " + instruction);
+    public void decfsz(int instruction) throws NoRegisterAddressException {
+        System.out.println("decfsz with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -161,6 +166,7 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *The contents of register ’f’ are
      *incremented. If ’d’ is 0, the result
@@ -168,8 +174,8 @@ public class Operations {
      *1, the result is placed back in
      *register ’f’.
      */
-    public void incf(int instruction) {
-        System.out.println("incf with: " + instruction);
+    public void incf(int instruction) throws NoRegisterAddressException {
+        System.out.println("incf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -185,6 +191,7 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *The contents of register 'f' are incremented.
      *If 'd' is 0 the result is placed in
@@ -194,8 +201,8 @@ public class Operations {
      *executed. If the result is 0, a NOP is executed
      *instead making it a 2TCY instruction.
      */
-    public void incfsz(int instruction) {
-        System.out.println("incfsz with: " + instruction);
+    public void incfsz(int instruction) throws NoRegisterAddressException {
+        System.out.println("incfsz with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -215,14 +222,15 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *Inclusive OR the W register with register
      *'f'. If 'd' is 0 the result is placed in the
      *W register. If 'd' is 1 the result is placed
      *back in register 'f'.
      */
-    public void iorwf(int instruction) {
-        System.out.println("iorwf with: " + instruction);
+    public void iorwf(int instruction) throws NoRegisterAddressException {
+        System.out.println("iorwf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -238,6 +246,7 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *The contents of register f is moved to a
      *destination dependant upon the status
@@ -246,8 +255,8 @@ public class Operations {
      *itself. d = 1 is useful to test a file register
      *since status flag Z is affected.
      */
-    public void movf(int instruction) {
-        System.out.println("movf with: " + instruction);
+    public void movf(int instruction) throws NoRegisterAddressException {
+        System.out.println("movf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -261,21 +270,43 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *Move data from W register to register
      *'f' or do nothing.
      */
-    public void movwf_nop(int instruction) {
-        System.out.println("movwf_nop with: " + instruction);
+    public void movwf_nop(int instruction) throws NoRegisterAddressException {
         if ((instruction & 0x0080) == 0x0080) {
-            System.out.println("movwf");
-            int address = instruction & 0x007F;
-            int value = register.getW();
-            register.setRegValue(address, value);
+            movwf(instruction);
+        } else {
+            nop(instruction);
         }
+    }
+
+
+    /*
+     *Move data from W register to register
+     *'f'.
+     */
+    public void movwf (int instruction) throws NoRegisterAddressException {
+        System.out.println("movwf with: 0x" + Integer.toHexString(instruction));
+        int address = instruction & 0x007F;
+        int value = register.getW();
+        register.setRegValue(address, value);
         register.incPC();
         register.incCycles();
     }
+
+
+    /*
+     *No operation.
+     */
+    public void nop (int instruction) throws NoRegisterAddressException {
+        System.out.println("nop with: 0x" + Integer.toHexString(instruction));
+        register.incPC();
+        register.incCycles();
+    }
+
 
     /*
      *The contents of register 'f' are rotated
@@ -284,8 +315,8 @@ public class Operations {
      *W register. If 'd' is 1 the result is stored
      *back in register 'f'.
      */
-    public void rlf(int instruction) {
-        System.out.println("rlf with: " + instruction);
+    public void rlf(int instruction) throws NoRegisterAddressException {
+        System.out.println("rlf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -304,6 +335,7 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *The contents of register 'f' are rotated
      *one bit to the right through the Carry
@@ -311,8 +343,8 @@ public class Operations {
      *W register. If 'd' is 1 the result is placed
      *back in register 'f'.
      */
-    public void rrf(int instruction) {
-        System.out.println("rrf with: " + instruction);
+    public void rrf(int instruction) throws NoRegisterAddressException {
+        System.out.println("rrf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -332,14 +364,15 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *Subtract (2’s complement method) W register
      *from register 'f'. If 'd' is 0 the result is
      *stored in the W register. If 'd' is 1 the
      *result is stored back in register 'f'.
      */
-    public void subwf(int instruction) {
-        System.out.println("subwf with: " + instruction);
+    public void subwf(int instruction) throws NoRegisterAddressException {
+        System.out.println("subwf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -352,11 +385,11 @@ public class Operations {
             int diff = w - f;
             value = 256 - diff;
             //CarryBit = 0 da negatives Ergebnis
-            //status = setBitAt(status, 0, 0);
+            register.clearBit(status, 0);
         } else {
             value = f - w;
             // CarryBit = 1 da Ergebnis 0 oder positiv
-            //status = setBitAt(status, 0, 1);
+            register.setBit(status, 0);
         }
         register.setRegValue(Register.STATUS, status);
         //falls value pos vorzeichen entfernen
@@ -372,14 +405,15 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *The upper and lower nibbles of register
      *'f' are exchanged. If 'd' is 0 the result is
      *placed in W register. If 'd' is 1 the result
      *is placed in register 'f'.
      */
-    public void swapf(int instruction) {
-        System.out.println("swapf with: " + Integer.toHexString(instruction));
+    public void swapf(int instruction) throws NoRegisterAddressException {
+        System.out.println("swapf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -395,6 +429,7 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *Exclusive OR the contents of the
      *W register with register 'f'. If 'd' is
@@ -402,8 +437,8 @@ public class Operations {
      *register. If 'd' is 1, the result is
      *stored back in register 'f'.
      */
-    public void xorwf(int instruction) {
-        System.out.println("xorwf with: " + Integer.toHexString(instruction));
+    public void xorwf(int instruction) throws NoRegisterAddressException {
+        System.out.println("xorwf with: 0x" + Integer.toHexString(instruction));
         instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
@@ -419,11 +454,12 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *Bit 'b' in register 'f' is cleared.
      */
-    public void bcf(int instruction) {
-        System.out.println("bcf with: " + instruction);
+    public void bcf(int instruction) throws NoRegisterAddressException {
+        System.out.println("bcf with: 0x" + Integer.toHexString(instruction));
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
         int pos = ((instruction & 0x0380) >> 7);
@@ -433,11 +469,12 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *Bit 'b' in register 'f' is set.
      */
-    public void bsf(int instruction) {
-        System.out.println("bsf with: " + instruction);
+    public void bsf(int instruction) throws NoRegisterAddressException {
+        System.out.println("bsf with: 0x" + Integer.toHexString(instruction));
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
         int pos = (instruction & 0x0380) >> 7;
@@ -447,20 +484,59 @@ public class Operations {
         register.incCycles();
     }
 
-    public void btfsc(int instruction) {
-        System.out.println("btfsc with: " + instruction);
+
+    /*
+     *If bit 'b' in register 'f' is '1' then the next
+     *instruction is executed.
+     *If bit 'b', in register 'f', is '0' then the next
+     *instruction is discarded, and a NOP is
+     *executed instead, making this a 2TCY
+     *instruction.
+     */
+    public void btfsc(int instruction) throws NoRegisterAddressException {
+        System.out.println("btfsc with: 0x" + Integer.toHexString(instruction));
+        instruction = instruction & 0x00FF;
+        int address = instruction & 0x007F;
+        int pos = (instruction & 0x0380) >> 7;
+        int f = register.getRegValue(address);
+        //Testet bit 'b' von f, wenn false dann nop()
+        if(register.testBit(f, pos) == false) {
+            nop(instruction);
+        }
+        register.incPC();
+        register.incCycles();
     }
 
-    public void btfss(int instruction) {
-        System.out.println("btfss with: " + instruction);
+
+    /*
+     *If bit 'b' in register 'f' is '0' then the next
+     *instruction is executed.
+     *If bit 'b' is '1', then the next instruction is
+     *discarded and a NOP is executed
+     *instead, making this a 2TCY instruction.
+     */
+    public void btfss(int instruction) throws NoRegisterAddressException {
+        System.out.println("btfss with: 0x" + Integer.toHexString(instruction));
+        instruction = instruction & 0x00FF;
+        int address = instruction & 0x007F;
+        int pos = (instruction & 0x0380) >> 7;
+        int f = register.getRegValue(address);
+        //Testet bit 'b' von f, wenn true dann nop(), nächste Anweisung wird übersprungen
+        if(register.testBit(f, pos)) {
+            nop(instruction);
+        }
+        register.incPC();
+        register.incCycles();
     }
+
 
     /*
      *The contents of the W register are
      *added to the eight bit literal 'k' and the
      *result is placed in the W register.
      */
-    public void addlw(int instruction) {
+    public void addlw(int instruction) throws NoRegisterAddressException {
+        System.out.println("addlw with: 0x" + Integer.toHexString(instruction));
         //Maskieren
         int value = instruction & 0x00FF;
         //Werte addieren
@@ -469,12 +545,14 @@ public class Operations {
         register.incCycles();
     }
 
+
     /*
      *The contents of W register are
      *AND’ed with the eight bit literal 'k'.The
      *result is placed in the W register.
      */
-    public void andlw(int instruction) {
+    public void andlw(int instruction) throws NoRegisterAddressException {
+        System.out.println("andlw with: 0x" + Integer.toHexString(instruction));
         //Maskieren
         int value = instruction & 0x00FF;
         //Werte ver'UND'en
@@ -483,21 +561,65 @@ public class Operations {
         register.incCycles();
     }
 
-    public void call(int instruction) {
-        System.out.println("call with: " + instruction);
+
+    /*
+     *
+     */
+    public void call(int instruction) throws NoRegisterAddressException {
+        System.out.println("call with: 0x" + Integer.toHexString(instruction));
+        System.out.println("call");
+        int k = instruction & 0x07FF;
+        //(PC+1) is pushed onto the stack
+        stack.push(register.getPC());
+
+        //0b---4 3xxx
+        int pcLath = register.getRegValue(Register.PCLATH);
+        //pcLath<4:3>
+        pcLath = (pcLath >> 3) & 0x03;
+        // 0tes und 1tes bit wird an 11te und 12te Stelle gerückt
+        pcLath = pcLath << 11;
+
+        // pc setzen
+        register.setPC(pcLath+k);
+        // 2 Cycles
+        register.incCycles();
+        register.incCycles();
     }
 
-    public void goTo(int instruction) {
-        System.out.println("goTo with: " + instruction);
+
+    /*
+     *GOTO is an unconditional branch. The
+     *eleven bit immediate value is loaded
+     *into PC bits <10:0>. The upper bits of
+     *PC are loaded from PCLATH<4:3>.
+     *GOTO is a two cycle instruction.
+     */
+    public void goTo(int instruction) throws NoRegisterAddressException {
+        System.out.println("goTo with: 0x" + Integer.toHexString(instruction));
+        int k = instruction & 0x00FF;
+
+        //0b---4 3xxx
+        int pcLath = register.getRegValue(Register.PCLATH);
+        //pcLath<4:3>
+        pcLath = (pcLath >> 3) & 0x03;
+        // 0tes und 1tes bit wird an 11te und 12te Stelle gerückt
+        pcLath = pcLath << 11;
+
+        // pc setzen
+        register.setPC(pcLath + k);
+        // 2 Cycles
+        register.incCycles();
+        register.incCycles();
     }
+
 
     /*
      *The contents of the W register is
      *OR’ed with the eight bit literal 'k'. The
      *result is placed in the W register.
      */
-    public void iorlw(int instruction) {
-        System.out.println("iorlw with: " + instruction);
+    public void iorlw(int instruction) throws NoRegisterAddressException {
+        System.out.println("iorlw with: 0x" + Integer.toHexString(instruction));
         //Maskieren
         int k = instruction & 0x00FF;
         //Werte ver'ODER'n
@@ -508,35 +630,115 @@ public class Operations {
         register.incCycles();
     }
 
-    public void movlw(int instruction) {
-        System.out.println("movlw with: " + instruction);
+
+    /*
+     *The eight bit literal 'k' is loaded into W
+     *register. The don’t cares will assemble
+     *as 0’s.
+     */
+    public void movlw(int instruction) throws NoRegisterAddressException {
+        System.out.println("movlw with: 0x" + Integer.toHexString(instruction));
+        int k = instruction & 0x00FF;
+        register.setW(k);
+        register.incPC();
+        register.incCycles();
     }
 
-    public void retlw(int instruction) {
-        System.out.println("retlw with: " + instruction);
+
+    public void retlw(int instruction) throws NoRegisterAddressException {
+        System.out.println("retlw with: 0x" + Integer.toHexString(instruction));
+        int value;
+        int k = instruction & 0x00FF;
+        // process data
+        value = k;
+        // write to destination
+        register.setW(value);
+
+        //TOS --> PC
+        int pc = stack.pop();
+        register.setPC(pc);
+
+        // 2 Cycles
+        register.incCycles();
+        register.incCycles();
     }
 
-    public void sublw(int instruction) {
-        System.out.println("sublw with: " + instruction);
+
+    /*
+     *The W register is subtracted (2’s complement
+     *method) from the eight bit literal 'k'.
+     *The result is placed in the W register.
+     */
+    public void sublw(int instruction) throws NoRegisterAddressException {
+        System.out.println("sublw with: 0x" + Integer.toHexString(instruction));
+        int k = instruction & 0x00FF;
+        int w = register.getW();
+        int value;
+        // process data
+        if (w > k) {
+            // CarryBit = 0, da negatives Ergebnis
+            register.clearBit(Register.STATUS, 0);
+            //Überlauf
+            int diff = w - k;
+
+            value = 256 - diff;
+        } else {
+            //CarryBit = 1 da Ergebnis positiv oder 0
+            register.setBit(Register.STATUS, 0);
+            value = k - w;
+        }
+        //Check DC
+        if ((w & 0x0F) > (k & 0x0F)) {
+            //DC = 0 da negatives Ergebnis
+            register.clearBit(Register.STATUS, 1);
+        } else {
+            // DC = 1 da Ergebnis 0 oder positiv
+            register.setBit(Register.STATUS, 1);
+        }
+        //Check CarryBit
+        register.checkZeroBit(value);
+        //write to destinaton
+        register.setW(value);
+        register.incPC();
+        register.incCycles();
     }
 
-    public void xorlw(int instruction) {
-        System.out.println("xorlw with: " + instruction);
+
+    public void xorlw(int instruction) throws NoRegisterAddressException {
+        System.out.println("xorlw with: 0x" + Integer.toHexString(instruction));
+        System.out.println("xorlw");
+        int k = instruction & 0x00FF;
+        int w = register.getW();
+        // process data
+        int value = w ^ k;
+        register.setW(value);
+        register.checkZeroBit(value);
+        register.incPC();
+        register.incCycles();
     }
+
 
     public void clrwdt(int instruction) {
-        System.out.println("clrwdt with: " + instruction);
+        System.out.println("clrwdt with: 0x" + Integer.toHexString(instruction));
     }
+
 
     public void retfie(int instruction) {
-        System.out.println("retfie with: " + instruction);
+        System.out.println("retfie with: 0x" + Integer.toHexString(instruction));
     }
 
-    public void ret(int instruction) {
-        System.out.println("ret with: " + instruction);
+
+    public void ret(int instruction) throws NoRegisterAddressException {
+        System.out.println("ret with: 0x" + Integer.toHexString(instruction));
+        System.out.println("return");
+        //PC vom stack
+        int pc = stack.pop();
+        register.setPC(pc);
+        register.incCycles();
     }
+
 
     public void sleep(int instruction) {
-        System.out.println("sleep with: " + instruction);
+        System.out.println("sleep with: 0x" + Integer.toHexString(instruction));
     }
 }

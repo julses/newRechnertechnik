@@ -22,17 +22,19 @@ import model.Converter;
 public class Scan {
 
     private Converter convert = new Converter();
-    private List<String> binaryCode;
+    //private List<String> binaryCode;
     private List<String> hexCode;
     private Iterator<String> iterator;
+    private Register register;
     private final String DELIM = "([0-9]|[A-F])+([0-9]|[A-F])*";
     private final Pattern PATTERN = Pattern.compile(DELIM);
     private Matcher matcher;
     private Path pathToLSTFile;
 
-    public Scan(List<String> binaryCode, List<String> hexCode) {
-        this.binaryCode = binaryCode;
+    public Scan(List<String> hexCode, Register register) {
+        //this.binaryCode = binaryCode;
         this.hexCode = hexCode;
+        this.register = register;
     }
 
     public void setPathToLSTFile(Path pathToLSTFile) {
@@ -56,14 +58,15 @@ public class Scan {
                  * val += zeile;
                  */
                 hexCode.add(zeile);
+                /*
                 binaryCode.add(convert.hexStringToBinString(zeile));           //binaryCode binär
                 for (int j = 0; j < binaryCode.size(); j++) {
                     if (zeile.length() < 4) binaryCode.set(j, "Fehler");
-                }
+                }*/
             }
         }
         dotxt(hexCode, "HexCodeBefehle");
-        dotxt(binaryCode, "BinärCodeBefehle");
+        //dotxt(binaryCode, "BinärCodeBefehle");
         iterator = hexCode.iterator();
         br.close();
     }
@@ -100,7 +103,7 @@ public class Scan {
 
     }
 
-
+    /*Oldie but goldie ;)
     public String getOperation(){
         //Test welche Binärzahlen in Liste stehen
         if(iterator.hasNext()){
@@ -109,6 +112,10 @@ public class Scan {
             System.out.println("Kein Befehl mehr vorhanden!");
             return null;
         }
+    }*/
+
+    public String getOper() {
+        return hexCode.get(register.getPC());
     }
 
 }
