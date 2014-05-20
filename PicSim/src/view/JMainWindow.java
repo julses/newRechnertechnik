@@ -5,7 +5,6 @@ import exceptions.NoRegisterAddressException;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -22,6 +21,7 @@ import java.io.IOException;
 
 public class JMainWindow implements ActionListener {
 
+    private static final int DELAY = 100; // 1/100th second
     public static boolean running;
     public static Timer timer;
     private MenuBar menuBar;
@@ -103,18 +103,6 @@ public class JMainWindow implements ActionListener {
     JLabel labelacc;
     JLabel labelwreg;
 
-    class StartListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            timer.start();
-        }
-    }
-
-    class StopListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            timer.stop();
-        }
-    }
-
     public JMainWindow(final MenuBar menuBar) {
         this.menuBar = menuBar;
         hauptFenster = new JFrame("PicSim 0.0.1");
@@ -190,16 +178,10 @@ public class JMainWindow implements ActionListener {
         //hauptFenster.pack();//Passt Buttons an
         hauptFenster.setVisible(true);
 
-        timer = new Timer(500, new ActionListener() {
+        timer = new Timer(DELAY, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                try {
-                    menuBar.step();
-                } catch (NoInstructionException e) {
-                    e.printStackTrace();
-                } catch (NoRegisterAddressException e) {
-                    e.printStackTrace();
-                }
+                step();
             }
         });
     }
@@ -229,10 +211,8 @@ public class JMainWindow implements ActionListener {
         about = new JMenuItem("Über");
         about.addActionListener(this);
         startStopButton = new JButton("Start");
-        startStopButton.addActionListener(new StartListener());
         startStopButton.addActionListener(this);
         resetButton = new JButton("Reset");
-        resetButton.addActionListener(new StopListener());
         resetButton.addActionListener(this);
         stepButton = new JButton("Step");
         stepButton.setVisible(true);
@@ -254,13 +234,7 @@ public class JMainWindow implements ActionListener {
 
     public void actionPerformed(ActionEvent object) {
         if (object.getSource() == stepButton)
-            try {
-                menuBar.step();
-            } catch (NoInstructionException e) {
-                e.printStackTrace();
-            } catch (NoRegisterAddressException e) {
-                e.printStackTrace();
-            }
+            step();
 
         if (object.getSource() == startStopButton){
             toggleRunning();
@@ -292,14 +266,9 @@ public class JMainWindow implements ActionListener {
         if (object.getSource() == beenden) {
             System.exit(0);
         }
+
         if (object.getSource() == step) {
-            try {
-                menuBar.step();
-            } catch (NoInstructionException e) {
-                e.printStackTrace();
-            } catch (NoRegisterAddressException e) {
-                e.printStackTrace();
-            }
+            step();
         }
         if (object.getSource() == einstellungen) {
             System.out.println("einstellungen wurde angeklickt");
@@ -312,7 +281,17 @@ public class JMainWindow implements ActionListener {
         }
     }
 
+    private void step() {
+        try {
+            menuBar.step();
+        } catch (NoInstructionException e) {
+            e.printStackTrace();
+        } catch (NoRegisterAddressException e) {
+            e.printStackTrace();
+        }
+    }
 
+    //Prüft ob Programm läuft. Wenn nicht startet es...
     private void toggleRunning() {
         if (this.running) {
             stop();
