@@ -87,15 +87,15 @@ public class Register {
         }
 
         if (isGPRAddr(address)) {
-            //writeGPR(address, value);
+            writeGPR(address, value);
         } else {
             writeSFR(address, value);
         }
     }
 
 
-    public void writeThough(int addr, int value) throws NoRegisterAddressException {
-        switch (addr) {
+    public void setRegValueByInput(int address, int value) throws NoRegisterAddressException {
+        switch (address) {
             case PORTA:
                 reg[PORTA] = value;
                 latchPortA = value;
@@ -108,7 +108,7 @@ public class Register {
                 //TODO : Ausgabe
                 break;
             default:
-                setRegValue(addr, value);
+                setRegValue(address, value);
         }
     }
 
@@ -120,6 +120,14 @@ public class Register {
         return false;
     }
 
+    private void writeGPR(int address, int value) {
+        // Vorderes Bit durch Maskierung löschen
+        reg[address & 0x7F] = value;
+        // Vorderes Bit durch Veroderung hinzufügen
+        reg[address | 0x80] = value;
+        //TODO : Ausgabe
+    }
+
     private void writeSFR(int addr, int value) {
         // Bank auswählen
         addr = selectBank(addr);
@@ -129,8 +137,7 @@ public class Register {
             case INDF:
             case INDF + OFFSET:
                 //indirekte Adressierung
-                //TODO : GPR Addressen schreiben
-                //writeGPR(reg[FSR], value);
+                writeGPR(reg[FSR], value);
                 break;
 
             //PCL spiegeln

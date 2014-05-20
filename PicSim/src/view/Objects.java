@@ -12,9 +12,9 @@ import java.awt.*;
  */
 public class Objects {
     public static String[][] rowData;
-
     public static String[] columnNames;
 
+    //Hauptelemente
     public static JFrame hauptFenster;
     public static Container container;
     // Buttonliste

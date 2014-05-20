@@ -175,11 +175,13 @@ public class JMainWindow implements ActionListener {
         about = new JMenuItem("Über");
         about.addActionListener(this);
         startStopButton = new JButton("Start");
+        startStopButton.setToolTipText("Programm starten");
         startStopButton.addActionListener(this);
         resetButton = new JButton("Reset");
+        resetButton.setToolTipText("Setzt den PIC auf Standardwerte zurück");
         resetButton.addActionListener(this);
         stepButton = new JButton("Step");
-        stepButton.setVisible(true);
+        stepButton.setToolTipText("Führt nächsten Schritt aus");
         stepButton.addActionListener(this);
 
         // Menüelemente hinzufügen
@@ -226,6 +228,7 @@ public class JMainWindow implements ActionListener {
         this.running = true;
         this.timer.restart();
         startStopButton.setText("Stop");
+        startStopButton.setToolTipText("Programm anhalten");
     }
 
     //Stoppt das Programm
@@ -233,5 +236,6 @@ public class JMainWindow implements ActionListener {
         this.running = false;
         this.timer.stop();
         startStopButton.setText("Start");
+        startStopButton.setToolTipText("Programm starten");
     }
 }
