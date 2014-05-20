@@ -120,4 +120,7 @@ public class Scan {
         return hexCode.get(register.getPC());
     }
 
+    public void reset() {
+        register.valueOnReset();
+    }
 }

@@ -2,10 +2,8 @@ package view;
 
 import exceptions.NoInstructionException;
 import exceptions.NoRegisterAddressException;
-import model.PicSim;
 
 import javax.swing.*;
-import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.event.ActionEvent;
@@ -24,9 +22,10 @@ import java.io.IOException;
 
 public class JMainWindow implements ActionListener {
 
+    public static boolean running;
+    public static Timer timer;
     private MenuBar menuBar;
 
-    Timer timer;
 
     String[][] rowData;
 
@@ -75,8 +74,8 @@ public class JMainWindow implements ActionListener {
     Container container;
     // Buttonliste
     JButton stepButton;
-    JButton runButton;
-    JButton stopButton;
+    JButton startStopButton;
+    JButton resetButton;
 
     // Menüleiste
     JMenuBar menueLeiste;
@@ -170,8 +169,8 @@ public class JMainWindow implements ActionListener {
 
         // Buttons dem Panel hinzufügen
         two.add(stepButton);
-        two.add(runButton);
-        two.add(stopButton);
+        two.add(startStopButton);
+        two.add(resetButton);
         two.add(stepButton);
 
         pone.add(scrollPane);//Texfeld mit Scrollbar dem
@@ -206,34 +205,6 @@ public class JMainWindow implements ActionListener {
     }
 
     private void JMenuBar() {
-        stepButton = new JButton("Step");
-        //stepButton.setPreferredSize(new Dimension(10, 10));
-        stepButton.setVisible(true);
-        stepButton.addMouseListener(new MouseAdapter() {
-           @Override
-           public void mouseClicked(MouseEvent e) {
-               super.mousePressed(e);
-           }
-        });
-        runButton = new JButton("Run");
-        //runButton.setVisible(true);
-        runButton.addActionListener(new StartListener());
-        /*runButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mousePressed(e);
-            }
-        });*/
-        stopButton = new JButton("Stop");
-        //stopButton.setVisible(true);
-        stopButton.addActionListener(new StopListener());
-        /*
-        stopButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mousePressed(e);
-            }
-        }); */
 
         // Menüleiste erzeugen
         menueLeiste = new JMenuBar();
@@ -257,9 +228,15 @@ public class JMainWindow implements ActionListener {
         doku.addActionListener(this);
         about = new JMenuItem("Über");
         about.addActionListener(this);
+        startStopButton = new JButton("Start");
+        startStopButton.addActionListener(new StartListener());
+        startStopButton.addActionListener(this);
+        resetButton = new JButton("Reset");
+        resetButton.addActionListener(new StopListener());
+        resetButton.addActionListener(this);
+        stepButton = new JButton("Step");
+        stepButton.setVisible(true);
         stepButton.addActionListener(this);
-        runButton.addActionListener(this);
-        stopButton.addActionListener(this);
 
         // Menüelemente hinzufügen
         menueLeiste.add(datei);
@@ -276,18 +253,22 @@ public class JMainWindow implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent object) {
-            if (object.getSource() == stepButton) try {
+        if (object.getSource() == stepButton)
+            try {
                 menuBar.step();
             } catch (NoInstructionException e) {
                 e.printStackTrace();
             } catch (NoRegisterAddressException e) {
                 e.printStackTrace();
             }
-        if (object.getSource() == runButton) {
 
+        if (object.getSource() == startStopButton){
+            toggleRunning();
         }
-        if (object.getSource() == stopButton) {
-            System.out.println("stopButton pressed");
+
+        if (object.getSource() == resetButton) {
+            if (this.running) stop();
+            menuBar.reset();
         }
 
         if (object.getSource() == oeffnen) {
@@ -302,33 +283,53 @@ public class JMainWindow implements ActionListener {
                     lstFile.read(br,null);
                     zeile = br.readLine();
                 }
-
                 br.close();
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (object.getSource() == beenden) {
-                System.exit(0);
-            }
-            if (object.getSource() == step) {
-                try {
-                    menuBar.step();
-                } catch (NoInstructionException e) {
-                    e.printStackTrace();
-                } catch (NoRegisterAddressException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (object.getSource() == einstellungen) {
-                System.out.println("einstellungen wurde angeklickt");
-            }
-            if (object.getSource() == doku) {
-                System.out.println("doku wurde angeklickt");
-            }
-            if (object.getSource() == about) {
-                menuBar.ueber();
+        }
+
+        if (object.getSource() == beenden) {
+            System.exit(0);
+        }
+        if (object.getSource() == step) {
+            try {
+                menuBar.step();
+            } catch (NoInstructionException e) {
+                e.printStackTrace();
+            } catch (NoRegisterAddressException e) {
+                e.printStackTrace();
             }
         }
+        if (object.getSource() == einstellungen) {
+            System.out.println("einstellungen wurde angeklickt");
+        }
+        if (object.getSource() == doku) {
+            System.out.println("doku wurde angeklickt");
+        }
+        if (object.getSource() == about) {
+            menuBar.ueber();
+        }
+    }
+
+
+    private void toggleRunning() {
+        if (this.running) {
+            stop();
+        } else {
+            start();
+        }
+    }
+
+    public void start() {
+        this.running = true;
+        this.timer.restart();
+        this.startStopButton.setText("Stop");
+    }
+
+    private void stop() {
+        this.running = false;
+        this.timer.stop();
+        this.startStopButton.setText("Start");
     }
 }

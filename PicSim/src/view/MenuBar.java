@@ -80,4 +80,8 @@ public class MenuBar{
         //Instruction ausführen
         parser.exec(instruction, opcode);
     }
+
+    public void reset() {
+        scanner.reset();
+    }
 }
