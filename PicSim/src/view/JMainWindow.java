@@ -7,9 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import static view.Objects.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,15 +23,11 @@ public class JMainWindow implements ActionListener {
     public static boolean running;
     public static Timer timer;
     private MenuBar menuBar;
-
-
-    String[][] rowData;
-
-    String[] columnNames;
+    private Listener listener;
 
     {
         columnNames = new String[]{
-                  "  ","00", "01","02","03","04","05","06","07"
+                "  ","00", "01","02","03","04","05","06","07"
         };
         rowData = new String[][]{
 
@@ -70,41 +64,9 @@ public class JMainWindow implements ActionListener {
         };
     }
 
-    JFrame hauptFenster;
-    Container container;
-    // Buttonliste
-    JButton stepButton;
-    JButton startStopButton;
-    JButton resetButton;
-
-    // Menüleiste
-    JMenuBar menueLeiste;
-    // Menüleiste Elemente
-    JMenu datei;
-    JMenu optionen;
-    JMenu hilfe;
-    // Datei
-    JMenuItem oeffnen;
-    JMenuItem beenden;
-    // Optionen
-    JMenuItem step;
-    JMenuItem einstellungen;
-    // Hilfe
-    JMenuItem doku;
-    JMenuItem about;
-    // Textfeld
-    JTextArea lstFile;
-
-    JTextField pcl;
-    JTextField acc;
-    JTextField wreg;
-
-    JLabel labelpcl;
-    JLabel labelacc;
-    JLabel labelwreg;
-
     public JMainWindow(final MenuBar menuBar) {
         this.menuBar = menuBar;
+        listener = new Listener(this, menuBar, running);
         hauptFenster = new JFrame("PicSim 0.0.1");
         container = hauptFenster.getContentPane();
         container.setLayout(new BorderLayout());
@@ -204,6 +166,8 @@ public class JMainWindow implements ActionListener {
         beenden.addActionListener(this);
         step = new JMenuItem("Step");
         step.addActionListener(this);
+        reset = new JMenuItem("Reset PIC");
+        reset.addActionListener(this);
         einstellungen = new JMenuItem("Einstellungen");
         einstellungen.addActionListener(this);
         doku = new JMenuItem("Dokumentation");
@@ -227,61 +191,18 @@ public class JMainWindow implements ActionListener {
         datei.add(oeffnen);
         datei.add(beenden);
         optionen.add(step);
+        optionen.add(reset);
         optionen.add(einstellungen);
         hilfe.add(doku);
         hilfe.add(about);
     }
 
     public void actionPerformed(ActionEvent object) {
-        if (object.getSource() == stepButton)
-            step();
-
-        if (object.getSource() == startStopButton){
-            toggleRunning();
-        }
-
-        if (object.getSource() == resetButton) {
-            if (this.running) stop();
-            menuBar.reset();
-        }
-
-        if (object.getSource() == oeffnen) {
-            try {
-                menuBar.oeffnen();
-                FileReader fr = new FileReader(String.valueOf(menuBar.pathToSource));
-                BufferedReader br = new BufferedReader(fr);
-
-                String zeile = "";
-                while ((zeile = br.readLine()) != null)
-                {
-                    lstFile.read(br,null);
-                    zeile = br.readLine();
-                }
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (object.getSource() == beenden) {
-            System.exit(0);
-        }
-
-        if (object.getSource() == step) {
-            step();
-        }
-        if (object.getSource() == einstellungen) {
-            System.out.println("einstellungen wurde angeklickt");
-        }
-        if (object.getSource() == doku) {
-            System.out.println("doku wurde angeklickt");
-        }
-        if (object.getSource() == about) {
-            menuBar.ueber();
-        }
+        listener.actionPerformed(object);
     }
 
-    private void step() {
+    //Führt nächsten Befehl im Programm aus
+    public void step() {
         try {
             menuBar.step();
         } catch (NoInstructionException e) {
@@ -292,7 +213,7 @@ public class JMainWindow implements ActionListener {
     }
 
     //Prüft ob Programm läuft. Wenn nicht startet es...
-    private void toggleRunning() {
+    public void toggleRunning() {
         if (this.running) {
             stop();
         } else {
@@ -300,15 +221,17 @@ public class JMainWindow implements ActionListener {
         }
     }
 
+    //Startet das Programm
     public void start() {
         this.running = true;
         this.timer.restart();
-        this.startStopButton.setText("Stop");
+        startStopButton.setText("Stop");
     }
 
-    private void stop() {
+    //Stoppt das Programm
+    public void stop() {
         this.running = false;
         this.timer.stop();
-        this.startStopButton.setText("Start");
+        startStopButton.setText("Start");
     }
 }

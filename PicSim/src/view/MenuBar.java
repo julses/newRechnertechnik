@@ -19,7 +19,6 @@ import java.nio.file.Path;
  */
 public class MenuBar{
 
-    //private Register register = new Register();
     private Converter convert = new Converter();
     private Scan scanner;
     private Pars parser;
