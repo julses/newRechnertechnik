@@ -575,7 +575,7 @@ public class Operations {
         System.out.println("call with: 0x" + Integer.toHexString(instruction));
         int k = instruction & 0x07FF;
         //(PC+1) is pushed onto the stack
-        stack.push(register.getPC());
+        stack.push((register.getPC()+1));
 
         //0b---4 3xxx
         int pcLath = register.getRegValue(Register.PCLATH);
