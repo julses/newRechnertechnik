@@ -46,6 +46,7 @@ public class Register {
     private int latchPortA;
     private int latchPortB;
 
+
     public Register(Stack stack) {
         this.stack = stack;
         cycles = 0;
@@ -122,8 +123,8 @@ public class Register {
     }
 
     //Überprüft ob es sich um GPR (General Purpose Registers) Adresse handelt
-    public boolean isGPRAddr(int addr) {
-        if (((addr & 0x007F) >= GPR_START) && (addr & 0x007F) <= GPR_END) {
+    public boolean isGPRAddr(int address) {
+        if (((address & 0x7F) >= GPR_START) && (address & 0x7F) <= GPR_END) {
             return true;
         }
         return false;

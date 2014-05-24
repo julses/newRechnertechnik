@@ -1,6 +1,7 @@
 import model.Operations;
 import model.Pars;
 import model.Register;
+import model.Stack;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,8 +15,9 @@ import org.junit.Test;
  */
 
 public class OperationsTest {
-    Register register = new Register();
-    Operations oper = new Operations(register);
+    Stack stack = new Stack();
+    Register register = new Register(stack);
+    Operations oper = new Operations(register, stack);
     Pars pars = new Pars(oper);
 
 
@@ -73,79 +75,79 @@ public class OperationsTest {
 
     @Test
     public void testComf() throws Exception {
-        int instruction = 0x0950;
-        register.setRegValue(0x50, 0x13);
+        int instruction = 0x090c;
+        register.setRegValue(0x0c, 0x13);
         int opcode = pars.decode(instruction);
         pars.exec(instruction, opcode);
-        Assert.assertEquals(0x13, register.getRegValue(0x50));
+        Assert.assertEquals(0x13, register.getRegValue(0x0c));
         Assert.assertEquals(0xEC, register.getW());
     }
 
     @Test
     public void testDecf() throws Exception {
-        int instruction = 0x03D0;
-        register.setRegValue(0x50, 0x1);
+        int instruction = 0x038c;
+        register.setRegValue(0x0c, 0x1);
         pars.exec(instruction, pars.decode(instruction));
-        Assert.assertEquals(0x0, register.getRegValue(0x50));
+        Assert.assertEquals(0x0, register.getRegValue(0x0c));
         Assert.assertTrue(register.getZeroBit());
     }
 
     @org.junit.Test
     public void testDecfsz() throws Exception {
-        int instruction = 0x0BD0;
+        int instruction = 0x0B8c;
         //Wert von 'f' decrementieren und in 'f' speichern, NOP() ausführen
-        register.setRegValue(0x50, 1);
+        register.setRegValue(0x0c, 1);
         register.setW(0x3);
         int opcode = pars.decode(instruction);
         pars.exec(instruction, opcode);
-        Assert.assertEquals(0x0, register.getRegValue(0x50));
+        Assert.assertEquals(0x0, register.getRegValue(0x0c));
         Assert.assertEquals(0x3, register.getW());
         Assert.assertEquals(2, register.getPC());
         //Wert von 'f' decrementieren und in 'f' speichern, unterlauf simmulieren, NOP nicht ausführen
         pars.exec(instruction, opcode);
-        Assert.assertEquals(0xFF, register.getRegValue(0x50));
+        Assert.assertEquals(0xFF, register.getRegValue(0x0c));
         Assert.assertEquals(0x3, register.getW());
         Assert.assertEquals(3, register.getPC());
         //Wert von 'f' decrementieren und in 'w' speichern, NOP() nicht ausführen
-        instruction = 0x0B50;
+        instruction = 0x0B0c;
         pars.exec(instruction, opcode);
-        Assert.assertEquals(0xFF, register.getRegValue(0x50));
+        Assert.assertEquals(0xFF, register.getRegValue(0x0c));
         Assert.assertEquals(0xFE, register.getW());
         Assert.assertEquals(4, register.getPC());
     }
 
     @Test
     public void testIncf() throws Exception {
-        int instruction = 0x0aDe;
-        register.setRegValue(0x5e, 0xFF);
+        int instruction = 0x0a8c;
+        register.setRegValue(0x0c, 0xFF);
         int opcode = pars.decode(instruction);
         pars.exec(instruction, opcode);
         //Value of f incremented?
-        Assert.assertEquals(0x0, register.getRegValue(0x5e));
+        Assert.assertEquals(0x0, register.getRegValue(0x0c));
         //Zero Bit affected?
         Assert.assertTrue(register.getZeroBit());
     }
 
     @org.junit.Test
     public void testIncfsz() throws Exception {
-        int instruction = 0x0FDc;
+        int instruction = 0x0F8c;
         //Wert von 'f' incrementieren und in 'f' speichern, überlauf simulieren, NOP() ausführen
-        register.setRegValue(0x5c, 0xFF);
+        register.setRegValue(0x0c, 0xFF);
         register.setW(0x3);
         int opcode = pars.decode(instruction);
         pars.exec(instruction, opcode);
-        Assert.assertEquals(0x0, register.getRegValue(0x5c));
+        Assert.assertEquals(0x0, register.getRegValue(0x0c));
         Assert.assertEquals(0x3, register.getW());
         Assert.assertEquals(2, register.getPC());
         //Wert von 'f' decrementieren und in 'f' speichern, NOP nicht ausführen
         pars.exec(instruction, opcode);
-        Assert.assertEquals(0x1, register.getRegValue(0x5c));
+        Assert.assertEquals(0x1, register.getRegValue(0x0c));
         Assert.assertEquals(0x3, register.getW());
         Assert.assertEquals(0x3, register.getPC());
         //Wert von 'f' decrementieren und in 'w' speichern, NOP() nicht ausführen
-        instruction = 0x0F5C;
+        instruction = 0x0F0C;
         pars.exec(instruction, opcode);
-        Assert.assertEquals(0x1, register.getRegValue(0x5c));
+        Assert.assertEquals(0x1, register.getRegValue(0x0c));
         Assert.assertEquals(0x2, register.getW());
         Assert.assertEquals(4, register.getPC());
     }
@@ -167,13 +169,12 @@ public class OperationsTest {
 
     @org.junit.Test
     public void testMovwf() throws Exception {
-    //TODO : Problem with decoding addresses of Bank 1
-        int instruction = 0x00D0;
-        register.setRegValue(0x50, 0xFF);
+        int instruction = 0x008c;
+        register.setRegValue(0x0c, 0xFF);
         register.setW(0x4F);
         int opcode = pars.decode(instruction);
         pars.exec(instruction, opcode);
-        Assert.assertEquals(0x4F, register.getRegValue(0x50));
+        Assert.assertEquals(0x4F, register.getRegValue(0x0c));
     }
 
     @Test
@@ -184,22 +185,22 @@ public class OperationsTest {
          * C = 0                     W = 1100 1100
          *                           C = 1
          */
-        int instruction = 0x0d50;
-        register.setRegValue(0x50, 0xe6);
+        int instruction = 0x0d0c;
+        register.setRegValue(0x0c, 0xe6);
         int opcode = pars.decode(instruction);
         pars.exec(instruction, opcode);
-        Assert.assertEquals(0xe6, register.getRegValue(0x50));
+        Assert.assertEquals(0xe6, register.getRegValue(0x0c));
         Assert.assertEquals(0xcc, register.getW());
         Assert.assertTrue(register.testBit(register.getRegValue(Register.STATUS), 0));
     }
 
     @Test
     public void testRrf() throws Exception {
-        int instruction = 0x0c51;
-        register.setRegValue(0x51, 0xe6);
+        int instruction = 0x0c0c;
+        register.setRegValue(0x0c, 0xe6);
         int opcode = pars.decode(instruction);
         pars.exec(instruction, opcode);
-        Assert.assertEquals(0xe6, register.getRegValue(0x51));
+        Assert.assertEquals(0xe6, register.getRegValue(0x0c));
         Assert.assertEquals(0x73, register.getW());
         Assert.assertFalse(register.testBit(register.getRegValue(Register.STATUS), 0));
     }
@@ -207,7 +208,7 @@ public class OperationsTest {
     @Test
     public void testSubwf() throws Exception {
         int instruction;
-        int addressf = 0x52;
+        int addressf = 0x0c;
 
         /*Case 1
          * Before Instruction       After Instruction
@@ -217,7 +218,7 @@ public class OperationsTest {
          * Z = ?                    Z = 0
          */
         register.valueOnReset();
-        instruction = 0x02d2;
+        instruction = 0x028c;
         register.setRegValue(addressf, 3);
         register.setW(2);
         pars.exec(instruction, pars.decode(instruction));
@@ -234,7 +235,7 @@ public class OperationsTest {
          * Z = ?                    Z = 1
          */
         register.valueOnReset();
-        instruction = 0x02d2;
+        instruction = 0x028c;
         register.setRegValue(addressf, 2);  //REG1 = 2
         register.setW(2);                   //W = 2
         pars.exec(instruction, pars.decode(instruction));
@@ -251,7 +252,7 @@ public class OperationsTest {
          * Z = ?                    Z = 0
          */
         register.valueOnReset();
-        instruction = 0x02d2;
+        instruction = 0x028c;
         register.setRegValue(addressf, 1);
         register.setW(2);
         pars.exec(instruction, pars.decode(instruction));
@@ -268,62 +269,62 @@ public class OperationsTest {
          * REG1 = 0xA5              REG1 = 0xA5
          *                          W = 0x5A
          */
-        register.setRegValue(0x53, 0xA5);
-        pars.exec(0x0e53, pars.decode(0x0e53));
-        Assert.assertEquals(0xA5, register.getRegValue(0x53));
+        register.setRegValue(0x0c, 0xA5);
+        pars.exec(0x0e0c, pars.decode(0x0e0c));
+        Assert.assertEquals(0xA5, register.getRegValue(0x0c));
         Assert.assertEquals(0x5A, register.getW());
         /*Case 2:
          * Before Instruction:      After Instruction:
          * REG1 = 0xA5              REG1 = 0x5A
          */
-        pars.exec(0x0ed3, pars.decode(0x0ed3));
-        Assert.assertEquals(0x5A, register.getRegValue(0x53));
+        pars.exec(0x0e8c, pars.decode(0x0e8c));
+        Assert.assertEquals(0x5A, register.getRegValue(0x0c));
     }
 
     @Test
     public void testXorwf() throws Exception {
-        register.setRegValue(0x54, 0xAF);
+        register.setRegValue(0x0c, 0xAF);
         register.setW(0xB5);
-        pars.exec(0x06d4, pars.decode(0x06d4));
-        Assert.assertEquals(0x1A, register.getRegValue(0x54));
+        pars.exec(0x068c, pars.decode(0x068c));
+        Assert.assertEquals(0x1A, register.getRegValue(0x0c));
         Assert.assertEquals(0xB5, register.getW());
     }
 
     @Test
     public void testBcf() throws Exception {
-        register.setRegValue(0x55, 0xC7);
-        pars.exec(0x13d5, pars.decode(0x13d5));
-        Assert.assertEquals(0x47, register.getRegValue(0x55));
+        register.setRegValue(0x0c, 0xC7);
+        pars.exec(0x138c, pars.decode(0x138c));
+        Assert.assertEquals(0x47, register.getRegValue(0x0c));
     }
 
     @org.junit.Test
     public void testBsf() throws Exception {
-        register.setRegValue(0x55, 0x0A);
-        pars.exec(0x17d5, pars.decode(0x17d5));
-        Assert.assertEquals(0x8A, register.getRegValue(0x55));
+        register.setRegValue(0x0c, 0x0A);
+        pars.exec(0x178c, pars.decode(0x178c));
+        Assert.assertEquals(0x8A, register.getRegValue(0x0c));
     }
 
     @org.junit.Test
     public void testBtfsc() throws Exception {
         //Kein NOP() ausführen
-        register.setRegValue(0x56, 0xFF);
-        pars.exec(0x18D6, pars.decode(0x18D6));
+        register.setRegValue(0x0c, 0xFF);
+        pars.exec(0x188c, pars.decode(0x188c));
         Assert.assertEquals(1, register.getPC());
         //NOP() ausführen
-        register.setRegValue(0x56, 0x00);
-        pars.exec(0x18D6, pars.decode(0x18D6));
+        register.setRegValue(0x0d, 0x00);
+        pars.exec(0x188d, pars.decode(0x188d));
         Assert.assertEquals(3, register.getPC());
     }
 
     @org.junit.Test
     public void testBtfss() throws Exception {
         //NOP() ausführen
-        register.setRegValue(0x57, 0xFF);
-        pars.exec(0x1FD7, pars.decode(0x1FD7));
+        register.setRegValue(0x0c, 0xFF);
+        pars.exec(0x1F8c, pars.decode(0x1F8c));
         Assert.assertEquals(2, register.getPC());
         //Kein NOP() ausführen
-        register.setRegValue(0x57, 0x00);
-        pars.exec(0x1DD7, pars.decode(0x1DD7));
+        register.setRegValue(0x0d, 0x00);
+        pars.exec(0x1D8d, pars.decode(0x1D8d));
         Assert.assertEquals(3, register.getPC());
     }
 
