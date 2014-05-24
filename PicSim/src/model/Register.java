@@ -84,8 +84,26 @@ public class Register {
         }
     }
 
+    public void setRegValue(int address, int value) throws NoRegisterAddressException {
+        switch (address) {
+            case PORTA:
+                reg[PORTA] = value;
+                latchPortA = value;
+                //TODO : Ausgabe
+                break;
+
+            case PORTB:
+                reg[PORTB] = value;
+                latchPortB = value;
+                //TODO : Ausgabe
+                break;
+            default:
+                writeRegValue(address, value);
+        }
+    }
+
     //Schreibt in Adresse des Registers
-    public void setRegValue(int address, int value) throws NoRegisterAddressException{
+    public void writeRegValue(int address, int value) throws NoRegisterAddressException{
         //Adressüberprüfung
         if (address > REG_MAX) {
             throw new NoRegisterAddressException(address);
@@ -100,25 +118,6 @@ public class Register {
             writeGPR(address, value);
         } else {
             writeSFR(address, value);
-        }
-    }
-
-
-    public void setRegValueByInput(int address, int value) throws NoRegisterAddressException {
-        switch (address) {
-            case PORTA:
-                reg[PORTA] = value;
-                latchPortA = value;
-                //TODO : Ausgabe
-                break;
-
-            case PORTB:
-                reg[PORTB] = value;
-                latchPortB = value;
-                //TODO : Ausgabe
-                break;
-            default:
-                setRegValue(address, value);
         }
     }
 
@@ -224,6 +223,43 @@ public class Register {
         return bankMask | address;
     }
 
+    //Gibt den Wert einer Addresse zurück
+    public int getRegValue(int address) throws NoRegisterAddressException {
+        //Adressüberprüfung
+        if (address > REG_MAX) {
+            throw new NoRegisterAddressException(address);
+        }
+        // Bank auswählen
+        address = selectBank(address);
+        switch (address) {
+            //Indirekte Adressierung
+            case INDF:
+            case INDF + OFFSET:
+                return reg[reg[FSR]];
+
+            //PORT A Eingänge lesen (TRIS A Reg = 1 --> eingang)
+            case PORTA:
+                return (reg[PORTA] & 0x1F);
+
+            //PORT B Eingänge lesen (TRIS B Reg = 1 --> eingang)
+            case PORTB:
+                return reg[PORTB];
+
+            //Registermaskierung
+            case TRISA:
+            case PCLATH:
+            case PCLATH + OFFSET:
+            case EECON1:
+                //0b0001 1111 --> Vordersten 3 Bit fallen weg
+                return reg[address] & 0x1F;
+            case UNIMPLEMENTED:
+            case UNIMPLEMENTED + OFFSET:
+                return 0;
+            default:
+                return reg[address];
+        }
+    }
+
     //Gibt den PC zurück
     public int getPC() {
         return (reg[PCLATH] << 8) + reg[PCL];
@@ -254,11 +290,6 @@ public class Register {
         return this.w & 0x00FF;
     }
 
-    //Gibt den Wert einer Addresse zurück
-    public int getRegValue(int addr) {
-        return reg[addr];
-    }
-
     public void checkDC(int value, int value2, boolean add) throws NoRegisterAddressException {
         //If add=true -> Addition
         if (add) {
@@ -276,7 +307,7 @@ public class Register {
     public void checkCarry(int f, int w, boolean add) throws NoRegisterAddressException {
         //If add=true -> Addition
         int status = getRegValue(STATUS);
-        if (add==true) {
+        if (add) {
             if(f + w > 0xFF){
                 setBit(status, 0);
                 setRegValue(STATUS, status);
@@ -306,7 +337,7 @@ public class Register {
     }
 
     //Gibt Zero Bit als booleschen Wert zurück
-    public boolean getZeroBit() {
+    public boolean getZeroBit() throws NoRegisterAddressException {
         return testBit(getRegValue(STATUS), 2);
     }
 

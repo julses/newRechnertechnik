@@ -501,7 +501,7 @@ public class Operations {
         int pos = (instruction & 0x0380) >> 7;
         int f = register.getRegValue(address);
         //Testet bit 'b' von f, wenn false dann nop()
-        if(register.testBit(f, pos) == false) {
+        if(!register.testBit(f, pos)) {
             nop(instruction);
         }
         register.incPC();

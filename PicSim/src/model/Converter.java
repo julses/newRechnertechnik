@@ -26,9 +26,8 @@ public class Converter {
         return var;
     }
 
-
+    //Umrechnung in Integerzahl
     public int hexStringToInt(String hex){
-        int var = new BigInteger(hex, 16).intValue();   //Umrechnung in Binärzahl
-        return var;
+        return new BigInteger(hex, 16).intValue();   //Umrechnung in Binärzahl
     }
 }

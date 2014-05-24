@@ -11,8 +11,9 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class Objects {
-    public static String[][] rowData;
+    public static Object[][] rowData;
     public static String[] columnNames;
+
 
     //Hauptelemente
     public static JFrame hauptFenster;
@@ -21,6 +22,15 @@ public class Objects {
     public static JButton stepButton;
     public static JButton startStopButton;
     public static JButton resetButton;
+
+    public static JButton pinone;
+    public static JButton pintwo;
+    public static JButton pinthree;
+    public static JButton pinfour;
+    public static JButton pinfive;
+    public static JButton pinsix;
+    public static JButton pinseven;
+    public static JButton pineight;
 
     // Menüleiste
     public static JMenuBar menueLeiste;
@@ -41,11 +51,11 @@ public class Objects {
     // Textfeld
     public static JTextArea lstFile;
 
-    public static JTextField pcl;
+    public static JTextField pc;
     public static JTextField acc;
     public static JTextField wreg;
 
-    public static JLabel labelpcl;
+    public static JLabel labelpc;
     public static JLabel labelacc;
     public static JLabel labelwreg;
 }

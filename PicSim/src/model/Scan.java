@@ -25,11 +25,9 @@ public class Scan {
     private Converter convert = new Converter();
     //private List<String> binaryCode;
     private List<String> hexCode;
-    private Iterator<String> iterator;
     private Register register;
     private final String DELIM = "([0-9]|[A-F])+([0-9]|[A-F])*";
     private final Pattern PATTERN = Pattern.compile(DELIM);
-    private Matcher matcher;
     private Path pathToLSTFile;
 
     public Scan(Register register) {
@@ -53,9 +51,7 @@ public class Scan {
 
             zeile = zeile.substring(5, 9);              //Befehlscode aus LST lesen
 
-            if (zeile.equals("    ") || !isHexValue(zeile)) {                 //Abfrage ob Leerzeile in LST
-                continue;
-            } else {
+            if (!(zeile.equals("    ") || !isHexValue(zeile))) {                 //Abfrage ob Leerzeile in LST
                 /* String val = "0x";
                  * val += zeile;
                  */
@@ -69,13 +65,13 @@ public class Scan {
         }
         dotxt(hexCode, "HexCodeBefehle");
         //dotxt(binaryCode, "BinärCodeBefehle");
-        iterator = hexCode.iterator();
+        Iterator<String> iterator = hexCode.iterator();
         br.close();
     }
 
 
     private boolean isHexValue(String val) {
-        matcher = PATTERN.matcher(val);
+        Matcher matcher = PATTERN.matcher(val);
         if (matcher.matches()) {
             return true;
         } else {

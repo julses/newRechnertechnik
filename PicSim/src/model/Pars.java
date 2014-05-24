@@ -131,7 +131,7 @@ public class Pars {
                 oper.decf(instruction);
                 break;
             case TOK_DECFSZ:
-                oper.decfsz(instruction);;
+                oper.decfsz(instruction);
                 break;
             case TOK_INCF:
                 oper.incf(instruction);

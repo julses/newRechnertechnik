@@ -4,6 +4,7 @@ import exceptions.NoInstructionException;
 import exceptions.NoRegisterAddressException;
 import model.Converter;
 import model.Pars;
+import model.Register;
 import model.Scan;
 
 import javax.swing.*;
@@ -22,11 +23,14 @@ public class MenuBar{
     private Converter convert = new Converter();
     private Scan scanner;
     private Pars parser;
+    private JMainWindow window;
+    public Register register;
     public Path pathToSource;
 
-    public MenuBar(Pars parser, Scan scanner) {
+    public MenuBar(Pars parser, Scan scanner, Register register) {
         this.parser = parser;
         this.scanner = scanner;
+        this.register=register;
     }
 
     public void oeffnen() throws IOException {

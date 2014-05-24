@@ -27,16 +27,22 @@ public class Listener implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent object) {
-        if (object.getSource() == stepButton)
+        if (object.getSource() == stepButton) {
             mainWindow.step();
+        }
 
         if (object.getSource() == startStopButton){
             mainWindow.toggleRunning();
         }
 
         if (object.getSource() == resetButton) {
-            if (this.running) mainWindow.stop();
+            if (this.running)
+            {
+                mainWindow.stop();
+            }
+
             menuBar.reset();
+            mainWindow.loadwindow();
         }
 
         if (object.getSource() == oeffnen) {
