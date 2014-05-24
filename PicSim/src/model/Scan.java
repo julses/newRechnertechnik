@@ -123,4 +123,5 @@ public class Scan {
     public void reset() {
         register.valueOnReset();
     }
+
 }

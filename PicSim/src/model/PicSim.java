@@ -14,6 +14,7 @@ import java.io.IOException;
  */
 public class PicSim {
 
+    private static Stack stack;
     private static Register register;
     private static Operations operations;
     private static Interrupts interrupts;
@@ -23,8 +24,9 @@ public class PicSim {
 
 
     public static void main(String[] args) throws IOException {
-        register = new Register();
-        operations = new Operations(register);
+        stack = new Stack();
+        register = new Register(stack);
+        operations = new Operations(register, stack);
         interrupts = new Interrupts(register);
         scanner = new Scan(register);
         parser = new Pars(operations);

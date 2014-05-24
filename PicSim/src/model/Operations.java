@@ -1,6 +1,5 @@
 package model;
 
-
 import exceptions.NoRegisterAddressException;
 
 /**
@@ -13,11 +12,11 @@ import exceptions.NoRegisterAddressException;
 public class Operations {
 
     private Stack stack;
+    private Register register;
 
-    Register register;
-    public Operations(Register register) {
+    public Operations(Register register, Stack stack) {
         this.register = register;
-        stack = new Stack();
+        this.stack = stack;
     }
 
 
@@ -565,11 +564,15 @@ public class Operations {
 
 
     /*
-     *
+     *Call Subroutine. First, return address
+     *(PC+1) is pushed onto the stack.The
+     *eleven bit immediate address is loaded
+     *into PC bits <10:0>. The upper bits of
+     *the PC are loaded from PCLATH. CALL
+     *is a two cycle instruction.
      */
     public void call(int instruction) throws NoRegisterAddressException {
         System.out.println("call with: 0x" + Integer.toHexString(instruction));
-        System.out.println("call");
         int k = instruction & 0x07FF;
         //(PC+1) is pushed onto the stack
         stack.push(register.getPC());
@@ -578,12 +581,12 @@ public class Operations {
         int pcLath = register.getRegValue(Register.PCLATH);
         //pcLath<4:3>
         pcLath = (pcLath >> 3) & 0x03;
-        // 0tes und 1tes bit wird an 11te und 12te Stelle gerückt
+        //0tes und 1tes bit wird an 11te und 12te Stelle gerückt
         pcLath = pcLath << 11;
 
-        // pc setzen
+        //pc setzen
         register.setPC(pcLath+k);
-        // 2 Cycles
+        //2 Cycles
         register.incCycles();
         register.incCycles();
     }
@@ -646,19 +649,21 @@ public class Operations {
         register.incCycles();
     }
 
-
+    /*
+     *The W register is loaded with the eight
+     *bit literal 'k'. The program counter is
+     *loaded from the top of the stack (the
+     *return address). This is a two cycle
+     *instruction.
+     */
     public void retlw(int instruction) throws NoRegisterAddressException {
         System.out.println("retlw with: 0x" + Integer.toHexString(instruction));
-        int value;
         int k = instruction & 0x00FF;
-        // process data
-        value = k;
-        // write to destination
-        register.setW(value);
+        // write to register w
+        register.setW(k);
 
         //TOS --> PC
-        int pc = stack.pop();
-        register.setPC(pc);
+        register.setPC(stack.pop());
 
         // 2 Cycles
         register.incCycles();
@@ -705,13 +710,15 @@ public class Operations {
         register.incCycles();
     }
 
-
+    /*
+     *The contents of the W register are
+     *XOR’ed with the eight bit literal 'k'.
+     *The result is placed in the W register.
+     */
     public void xorlw(int instruction) throws NoRegisterAddressException {
         System.out.println("xorlw with: 0x" + Integer.toHexString(instruction));
-        System.out.println("xorlw");
         int k = instruction & 0x00FF;
         int w = register.getW();
-        // process data
         int value = w ^ k;
         register.setW(value);
         register.checkZeroBit(value);
@@ -731,8 +738,7 @@ public class Operations {
 
 
     public void ret(int instruction) throws NoRegisterAddressException {
-        System.out.println("ret with: 0x" + Integer.toHexString(instruction));
-        System.out.println("return");
+        System.out.println("return with: 0x" + Integer.toHexString(instruction));
         //PC vom stack
         int pc = stack.pop();
         register.setPC(pc);

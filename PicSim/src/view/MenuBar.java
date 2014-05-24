@@ -83,4 +83,5 @@ public class MenuBar{
     public void reset() {
         scanner.reset();
     }
+
 }

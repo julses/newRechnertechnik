@@ -21,10 +21,19 @@ public class OperationsTest {
 
     @Test
     public void testAddwf() throws Exception {
-        int instruction = 0x784;
+        int instruction, opcode;
+
+        register.setW(0x1);
+        instruction = 0x0782;
+        opcode = pars.decode(instruction);
+        pars.exec(instruction, opcode);
+        Assert.assertEquals(0x1, register.getW());
+        Assert.assertEquals(0x2, register.getPC());
+
+        instruction = 0x784;
         register.setW(0x17);
         register.setRegValue(Register.FSR, 0xC2);
-        int opcode = pars.decode(instruction);
+        opcode = pars.decode(instruction);
         pars.exec(instruction, opcode);
         Assert.assertEquals(0xD9, register.getRegValue(Register.FSR));
         Assert.assertEquals(0x17, register.getW());

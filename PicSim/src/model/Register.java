@@ -39,13 +39,15 @@ public class Register {
     public static final int GPR_END = 0x2F;
     //***********************************
 
+    private Stack stack;
     private int cycles;
     private int w; //W-Register
     private int[] reg;
     private int latchPortA;
     private int latchPortB;
 
-    public Register() {
+    public Register(Stack stack) {
+        this.stack = stack;
         cycles = 0;
         reg = new int[0xFF];
 
@@ -56,6 +58,8 @@ public class Register {
     public void valueOnReset(){
         try {
             w = 0;
+            //Clear Stack
+            stack.clear();
             //Register Reset
             reg = new int[0xFF];
             System.out.println("RegisterArray erstellt, Wert von PCL: " + reg[PCL]);
@@ -84,6 +88,11 @@ public class Register {
         //Adressüberprüfung
         if (address > REG_MAX) {
             throw new NoRegisterAddressException(address);
+        }
+
+        //Unseporteten Adressbereich nicht beschreiben
+        if ((address & 0x7F) > GPR_END) {
+            return;
         }
 
         if (isGPRAddr(address)) {

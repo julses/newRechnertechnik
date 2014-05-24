@@ -67,7 +67,7 @@ public class JMainWindow implements ActionListener {
     public JMainWindow(final MenuBar menuBar) {
         this.menuBar = menuBar;
         listener = new Listener(this, menuBar, running);
-        hauptFenster = new JFrame("PicSim 0.0.1");
+        hauptFenster = new JFrame("PicSim 0.1");
         container = hauptFenster.getContentPane();
         container.setLayout(new BorderLayout());
 
