@@ -26,7 +26,7 @@ import static view.Objects.*;
 
 public class JMainWindow implements ActionListener, GUIListener {
 
-    private static final int DELAY = 100; // 1/100th second
+    private static final int DELAY = 50; // 1/100th second
     public static boolean running;
     public static Timer timer;
     private MenuBar menuBar;
@@ -244,10 +244,8 @@ public class JMainWindow implements ActionListener, GUIListener {
     public void toggleRunning() {
         if (this.running) {
             stop();
-            stepButton.setEnabled(true);
         } else {
             start();
-            stepButton.setEnabled(false);
         }
     }
 
@@ -257,6 +255,8 @@ public class JMainWindow implements ActionListener, GUIListener {
         this.timer.restart();
         startStopButton.setText("Stop");
         startStopButton.setToolTipText("Programm anhalten");
+        stepButton.setEnabled(false);
+        resetButton.setEnabled(false);
     }
 
     //Stoppt das Programm
@@ -265,6 +265,8 @@ public class JMainWindow implements ActionListener, GUIListener {
         this.timer.stop();
         startStopButton.setText("Start");
         startStopButton.setToolTipText("Programm starten");
+        stepButton.setEnabled(true);
+        resetButton.setEnabled(true);
     }
 
     public void loadwindow(){
@@ -284,7 +286,7 @@ public class JMainWindow implements ActionListener, GUIListener {
         int address = event.getAddress();
         int row = (address/8);
         int column = address%8;
-        int value = event.getValue();
+        String value = Integer.toHexString(event.getValue());
         model.setValueAt(value, row, column);
     }
 }

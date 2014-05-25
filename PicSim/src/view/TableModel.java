@@ -10,13 +10,12 @@ import javax.swing.table.AbstractTableModel;
  * To change this template use File | Settings | File Templates.
  */
 public class TableModel extends AbstractTableModel {
-    public int[][] row = new int[50][50] ;
+    public String[][] row = new String[50][50] ;
 
     public TableModel() {
         for (int i = 0; i < 5; i++) {
-
             for (int j = 0; j < 8; j++) {
-                row[i][j] = 1+j;
+                row[i][j] = "0";
             }
         }
     }
@@ -28,6 +27,7 @@ public class TableModel extends AbstractTableModel {
     public int getRowCount() {
         return row[0].length;
     }
+
     @Override
     public String getColumnName(int column) {
         switch (column) {
@@ -57,7 +57,7 @@ public class TableModel extends AbstractTableModel {
     }
 
     public void setValueAt(Object obj, int r, int c) {
-        row[r][c] = (Integer) obj;
+        row[r][c] = (String) obj;
         fireTableDataChanged();
     }
 
