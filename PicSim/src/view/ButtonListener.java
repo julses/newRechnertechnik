@@ -87,10 +87,9 @@ public class ButtonListener implements ActionListener {
             System.out.println("doku wurde angeklickt");
             if (Desktop.isDesktopSupported()) {
                 try {
-                    File myFile = new File("../../Dokumente/pic16f84A.pdf");
-                    Desktop.getDesktop().open(myFile);
-                } catch (IOException ex) {
-                    // no application registered for PDFs
+                    Desktop.getDesktop().open(new File("./Dokumente/pic16f84A.pdf"));
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
             }
         }
