@@ -98,13 +98,13 @@ public class Register {
             case PORTA:
                 reg[PORTA] = value;
                 latchPortA = value;
-                notifyUpdateGUI(new UpdateGUIEvent(this, SFR, selectBank(address), value));
+                notifyUpdateGUI(new UpdateGUIEvent(this, false, selectBank(address), value));
                 break;
 
             case PORTB:
                 reg[PORTB] = value;
                 latchPortB = value;
-                notifyUpdateGUI(new UpdateGUIEvent(this, SFR, selectBank(address), value));
+                notifyUpdateGUI(new UpdateGUIEvent(this, false, selectBank(address), value));
                 break;
             default:
                 writeRegValue(address, value);
@@ -136,14 +136,14 @@ public class Register {
         // Vorderes Bit durch Veroderung hinzufügen
         reg[address | 0x80] = value;
         //GUI updaten
-        notifyUpdateGUI(new UpdateGUIEvent(this, GPR, selectBank(address), value));
+        notifyUpdateGUI(new UpdateGUIEvent(this, false, selectBank(address), value));
     }
 
-    private void writeSFR(int addr, int value) {
+    private void writeSFR(int address, int value) {
         // Bank auswählen
-        addr = selectBank(addr);
+        address = selectBank(address);
         // Wert schreiben
-        switch (addr) {
+        switch (address) {
             //INDF spiegeln
             case INDF:
             case INDF + OFFSET:
@@ -183,14 +183,14 @@ public class Register {
                 value = value & 0x1F;
                 reg[TRISA] = value;
                 reg[PORTA] = latchPortA & ~reg[TRISA];
-                //GUI updaten
-                notifyUpdateGUI(new UpdateGUIEvent(this, SFR, PORTA, latchPortA & ~reg[TRISA]));
+                //GUI updaten Input/Output setzen
+                notifyUpdateGUI(new UpdateGUIEvent(this, true, TRISA, value));
                 break;
             case TRISB:
                 reg[TRISB] = value;
                 reg[PORTB] = latchPortB & ~reg[TRISB];
-                //GUI updaten
-                notifyUpdateGUI(new UpdateGUIEvent(this, SFR, PORTB, latchPortB & ~reg[TRISB]));
+                //GUI updaten Input/Output setzen
+                notifyUpdateGUI(new UpdateGUIEvent(this, true, TRISB, value));
                 break;
             //PCLATH spiegeln
             case PCLATH:
@@ -206,10 +206,10 @@ public class Register {
                 break;
             default:
                 //nicht spiegeln
-                reg[addr] = value;
+                reg[address] = value;
         }
-        //GUI updaten. 0=SFR, 1=GPR!!!
-        notifyUpdateGUI(new UpdateGUIEvent(this, SFR, selectBank(addr), value));
+        //GUI updaten
+        notifyUpdateGUI(new UpdateGUIEvent(this, false, selectBank(address), value));
     }
 
 
@@ -328,7 +328,7 @@ public class Register {
     }
 
     //Inkrementiert Cycles
-    public void incCycles() {
+    public void incCycles() throws NoRegisterAddressException {
         this.cycles++;
     }
 
@@ -349,12 +349,12 @@ public class Register {
     }
 
     //Setzt das Bit auf 1
-    static int setBit( int n, int pos ) {
+    public static int setBit( int n, int pos ) {
         return n | (1 << pos);
     }
 
     //Setzt das Bit auf 0
-    static int clearBit(int n, int pos) {
+    public static int clearBit(int n, int pos) {
         return n & ~(1 << pos);
     }
 

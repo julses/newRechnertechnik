@@ -9,14 +9,14 @@ import java.util.EventObject;
  * To change this template use File | Settings | File Templates.
  */
 public class UpdateGUIEvent extends EventObject{
-    private final int type;
+    private final boolean checkIO;
     private final int address;
     private final int value;
 
-    public UpdateGUIEvent( Object source, int type, int address, int value )
+    public UpdateGUIEvent( Object source, boolean checkIO, int address, int value )
     {
         super( source );
-        this.type = type;
+        this.checkIO = checkIO;
         this.address = address;
         this.value = value;
     }
@@ -25,8 +25,8 @@ public class UpdateGUIEvent extends EventObject{
         return address;
     }
 
-    public int getType() {
-        return type;
+    public boolean getCheckIO() {
+        return checkIO;
     }
 
     public int getValue() {

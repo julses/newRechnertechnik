@@ -67,7 +67,6 @@ public class MenuBar{
     }
 
     public void step() throws NoInstructionException, NoRegisterAddressException {
-        //TODO : Interrupts
         //Befehlsstring laden
         String stringopcode = scanner.getOper();
         //System.out.println(stringopcode);

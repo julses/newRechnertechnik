@@ -25,14 +25,22 @@ public class Objects {
     public static JButton startStopButton;
     public static JButton resetButton;
 
-    public static JButton pinone;
-    public static JButton pintwo;
-    public static JButton pinthree;
-    public static JButton pinfour;
-    public static JButton pinfive;
-    public static JButton pinsix;
-    public static JButton pinseven;
-    public static JButton pineight;
+    public static JCheckBox zeroA;
+    public static JCheckBox oneA;
+    public static JCheckBox twoA;
+    public static JCheckBox threeA;
+    public static JCheckBox fourA;
+
+    public static JCheckBox zeroB;
+    public static JCheckBox oneB;
+    public static JCheckBox twoB;
+    public static JCheckBox threeB;
+    public static JCheckBox fourB;
+    public static JCheckBox fiveB;
+    public static JCheckBox sixB;
+    public static JCheckBox sevenB;
+
+
 
     // Menüleiste
     public static JMenuBar menueLeiste;
@@ -54,11 +62,11 @@ public class Objects {
     public static JTextArea lstFile;
 
     public static JTextField pc;
-    public static JTextField acc;
+    public static JTextField SFR;
     public static JTextField wreg;
 
     public static JLabel labelpc;
-    public static JLabel labelacc;
+    public static JLabel labelSFR;
     public static JLabel labelwreg;
 
     public static AbstractTableModel model;

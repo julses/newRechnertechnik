@@ -2,17 +2,15 @@ package view;
 
 import exceptions.NoInstructionException;
 import exceptions.NoRegisterAddressException;
+import model.Register;
+import sun.security.acl.GroupImpl;
 import view.update.GUIListener;
 import view.update.UpdateGUIEvent;
 
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Random;
 
 import static view.Objects.*;
 
@@ -41,24 +39,22 @@ public class JMainWindow implements ActionListener, GUIListener {
         container.setLayout(new BorderLayout());
 
         GridLayout buttonLayout = new GridLayout(10,1,5,10);// Layout für das Buttonpanel /Spallten/Zeilen /xAbstand/yAbstand
-
+        GridLayout check=new GridLayout(8,4);
         JPanel ra = new JPanel();
-        JPanel rb = new JPanel();
         JPanel pone=new JPanel();//Panel für das Textfeld des Codes
         JPanel two = new JPanel();//Panel für Buttons
         JPanel reg = new JPanel();// Panel für Register Tabelle
 
-        two.setPreferredSize(new Dimension(100,10));
+        two.setPreferredSize(new Dimension(100, 10));
         two.setLayout(buttonLayout);//Panel two bekommt layout für Buttons übergeben
 
-        reg.setPreferredSize(new Dimension(250,300));
+        reg.setPreferredSize(new Dimension(250, 300));
+        ra.setLayout(check);
+        ra.setPreferredSize(new Dimension(250,300));
 
-        ra.setPreferredSize(new Dimension(20,100));
-        rb.setPreferredSize(new Dimension(20,100));
         JMenuBar();
 
         // Textfeld für Lst-File erzeugen
-
         lstFile = new JTextArea("Bitte wählen sie eine .LST Datei aus.");//Textarea mit Text erstellen
         JScrollPane scrollPane = new JScrollPane(lstFile);//Scrollbar mit oberfläche verknüpfen
         lstFile.setEnabled(false);//textfeld nich veraenderbar
@@ -75,13 +71,14 @@ public class JMainWindow implements ActionListener, GUIListener {
         scrolltable.setPreferredSize(new Dimension(250,300));
         scrolltable.setVisible(true);
 
-        JTable ratable= new JTable(3,8);
-        JTable rbtable= new JTable(3,8);
 
 
         labelpc =new JLabel("PC:");
-        labelacc=new JLabel("Accu:");
+        labelSFR=new JLabel("SFR:");
         labelwreg=new JLabel("W:");
+
+        SFR = new JTextField("",5);
+        SFR.setEnabled(false);
 
         pc = new JTextField("",5);
         pc.setEnabled(false);
@@ -111,18 +108,24 @@ public class JMainWindow implements ActionListener, GUIListener {
         reg.add(pc);
         reg.add(labelwreg);
         reg.add(wreg);
+        reg.add(labelSFR);
+        reg.add(SFR);
 
         //JPanel P bekommt verschiedene Pins zugewiesen
-        ra.add(pinone);
-        ra.add(pintwo);
-        ra.add(pinthree);
-        ra.add(pinfour);
-        ra.add(pinfive);
-        ra.add(pinsix);
-        ra.add(pinseven);
-        ra.add(pineight);
-        ra.add(ratable);
-        ra.add(rbtable);
+        ra.add(zeroA);
+        ra.add(oneA);
+        ra.add(twoA);
+        ra.add(threeA);
+        ra.add(fourA);
+        ra.add(zeroB);
+        ra.add(oneB);
+        ra.add(twoB);
+        ra.add(threeB);
+        ra.add(fourB);
+        ra.add(fiveB);
+        ra.add(sixB);
+        ra.add(sevenB);
+
 
         //Hauptfenster mit Attributen ausstatten
         hauptFenster.setSize(1024, 620);
@@ -176,37 +179,45 @@ public class JMainWindow implements ActionListener, GUIListener {
         stepButton.setToolTipText("Führt nächsten Schritt aus");
         stepButton.addActionListener(this);
         //pinoneButton erzeugen und einem ActionListener zuweisen
-        pinone = new JButton("P1.0");
-        pinone.setToolTipText("Pin 1.0");
-        pinone.addActionListener(this);
-        //pintwoButton erzeugen und einem ActionListener zuweisen
-        pintwo = new JButton("P1.1");
-        pintwo.setToolTipText("Pin 1.1");
-        pintwo.addActionListener(this);
+        zeroA = new JCheckBox("RA0");
+        zeroA.addActionListener(this);
+        //pinoneButton erzeugen und einem ActionListener zuweisen
+        oneA = new JCheckBox("RA1");
+        oneA.addActionListener(this);
+       //pintwoButton erzeugen und einem ActionListener zuweisen
+        twoA = new JCheckBox("RA2");
+        twoA.addActionListener(this);
         //pinthreeButton erzeugen und einem ActionListener zuweisen
-        pinthree = new JButton("P1.2");
-        pinthree.setToolTipText("Pin 1.2");
-        pinthree.addActionListener(this);
+        threeA = new JCheckBox("RA3");
+        threeA.addActionListener(this);
         //pinfourButton erzeugen und einem ActionListener zuweisen
-        pinfour = new JButton("P1.3");
-        pinfour.setToolTipText("Pin 1.3");
-        pinfour.addActionListener(this);
+        fourA = new JCheckBox("RA4");
+        fourA.addActionListener(this);
         //pinfiveButton erzeugen und einem ActionListener zuweisen
-        pinfive= new JButton("P1.4");
-        pinfive.setToolTipText("Pin 1.4");
-        pinfive.addActionListener(this);
+        zeroB = new JCheckBox("RB0");
+        zeroB.addActionListener(this);
         //pinsixButton erzeugen und einem ActionListener zuweisen
-        pinsix = new JButton("P1.5");
-        pinsix.setToolTipText("Pin 1.5");
-        pinsix.addActionListener(this);
+        oneB = new JCheckBox("RB1");
+        oneB.addActionListener(this);
         //pinsevenButton erzeugen und einem ActionListener zuweisen
-        pinseven = new JButton("P1.6");
-        pinseven.setToolTipText("Pin 1.6");
-        pinseven.addActionListener(this);
+        twoB = new JCheckBox("RB2");
+        twoB.addActionListener(this);
+
+        threeB = new JCheckBox("RB3");
+        threeB.addActionListener(this);
         //pineightButton erzeugen und einem ActionListener zuweisen
-        pineight = new JButton("P1.7");
-        pineight.setToolTipText("Pin 1.7");
-        pineight.addActionListener(this);
+        fourB = new JCheckBox("RB4");
+        fourB.addActionListener(this);
+
+        fiveB = new JCheckBox("RB5");
+        fiveB.addActionListener(this);
+
+        sixB = new JCheckBox("RB6");
+        sixB.addActionListener(this);
+
+        sevenB = new JCheckBox("RB7");
+        sevenB.addActionListener(this);
+
 
         // Menüelemente hinzufügen
         menueLeiste.add(datei);
@@ -233,6 +244,7 @@ public class JMainWindow implements ActionListener, GUIListener {
             menuBar.step();
             setwreg();
             setpcl();
+            setSFR();
         } catch (NoInstructionException e) {
             e.printStackTrace();
         } catch (NoRegisterAddressException e) {
@@ -280,13 +292,89 @@ public class JMainWindow implements ActionListener, GUIListener {
     public void setpcl(){
     pc.setText(String.valueOf(menuBar.register.getPC()));
     }
+    public void setSFR() throws NoRegisterAddressException {
+        SFR.setText(String.valueOf(menuBar.register.getRegValue(Register.FSR)));
+    }
 
     @Override
     public void update(UpdateGUIEvent event) {
         int address = event.getAddress();
-        int row = (address/8);
-        int column = address%8;
-        String value = Integer.toHexString(event.getValue());
-        model.setValueAt(value, row, column);
+        int value = event.getValue();
+        if (event.getCheckIO()) {
+            checkTris(address, value);
+        } else {
+            if(address == (Register.PORTA | Register.PORTB)) checkPorts(address, value);
+            int row = (address/8);
+            int column = (address%8)+1;
+            String stringValue = Integer.toHexString(event.getValue());
+            model.setValueAt(stringValue, row, column);
+        }
+    }
+
+    private void checkTris(int address, int value) {
+        if(address == Register.TRISA) {
+            //TRIS A I/O change
+            if(menuBar.register.testBit(value, 0)) zeroA.setEnabled(true);
+            else zeroA.setEnabled(false);
+            if(menuBar.register.testBit(value, 1)) oneA.setEnabled(true);
+            else oneA.setEnabled(false);
+            if(menuBar.register.testBit(value, 2)) twoA.setEnabled(true);
+            else twoA.setEnabled(false);
+            if(menuBar.register.testBit(value, 3)) threeA.setEnabled(true);
+            else threeA.setEnabled(false);
+            if(menuBar.register.testBit(value, 4)) fourA.setEnabled(true);
+            else fourA.setEnabled(false);
+        } else {
+            //TRIS B I/O change
+            if(menuBar.register.testBit(value, 0)) zeroB.setEnabled(true);
+            else zeroB.setEnabled(false);
+            if(menuBar.register.testBit(value, 1)) oneB.setEnabled(true);
+            else oneB.setEnabled(false);
+            if(menuBar.register.testBit(value, 2)) twoB.setEnabled(true);
+            else twoB.setEnabled(false);
+            if(menuBar.register.testBit(value, 3)) threeB.setEnabled(true);
+            else threeB.setEnabled(false);
+            if(menuBar.register.testBit(value, 4)) fourB.setEnabled(true);
+            else fourB.setEnabled(false);
+            if(menuBar.register.testBit(value, 4)) fourB.setEnabled(true);
+            else fourB.setEnabled(false);
+            if(menuBar.register.testBit(value, 4)) fourB.setEnabled(true);
+            else fourB.setEnabled(false);
+            if(menuBar.register.testBit(value, 4)) fourB.setEnabled(true);
+            else fourB.setEnabled(false);
+        }
+    }
+
+    private void checkPorts(int address, int value) {
+        if(address == Register.PORTA) {
+            //PORT A change checkBox
+            if(menuBar.register.testBit(value, 0)) zeroA.setSelected(true);
+            else zeroA.setSelected(false);
+            if(menuBar.register.testBit(value, 1)) oneA.setSelected(true);
+            else oneA.setSelected(false);
+            if(menuBar.register.testBit(value, 2)) twoA.setSelected(true);
+            else twoA.setSelected(false);
+            if(menuBar.register.testBit(value, 3)) threeA.setSelected(true);
+            else threeA.setSelected(false);
+            if(menuBar.register.testBit(value, 4)) fourA.setSelected(true);
+            else fourA.setSelected(false);
+        } else {
+            if(menuBar.register.testBit(value, 0)) zeroB.setSelected(true);
+            else zeroB.setSelected(false);
+            if(menuBar.register.testBit(value, 1)) oneB.setSelected(true);
+            else oneB.setSelected(false);
+            if(menuBar.register.testBit(value, 2)) twoB.setSelected(true);
+            else twoB.setSelected(false);
+            if(menuBar.register.testBit(value, 3)) threeB.setSelected(true);
+            else threeB.setSelected(false);
+            if(menuBar.register.testBit(value, 4)) fourB.setSelected(true);
+            else fourB.setSelected(false);
+            if(menuBar.register.testBit(value, 5)) fiveB.setSelected(true);
+            else fiveB.setSelected(false);
+            if(menuBar.register.testBit(value, 6)) sixB.setSelected(true);
+            else sixB.setSelected(false);
+            if(menuBar.register.testBit(value, 7)) sevenB.setSelected(true);
+            else sevenB.setSelected(false);
+        }
     }
 }
