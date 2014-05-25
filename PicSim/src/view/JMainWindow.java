@@ -2,11 +2,18 @@ package view;
 
 import exceptions.NoInstructionException;
 import exceptions.NoRegisterAddressException;
+import view.update.GUIListener;
+import view.update.UpdateGUIEvent;
 
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
+
 import static view.Objects.*;
 
 /**
@@ -17,57 +24,18 @@ import static view.Objects.*;
  * To change this template use File | Settings | File Templates.
  */
 
-public class JMainWindow implements ActionListener {
+public class JMainWindow implements ActionListener, GUIListener {
 
     private static final int DELAY = 100; // 1/100th second
     public static boolean running;
     public static Timer timer;
     private MenuBar menuBar;
-    private Listener listener;
-
-    {
-
-        columnNames = new String[]{
-                "  ","00", "01","02","03","04","05","06","07"
-        };
-        rowData = new Object[][]{
-
-                {"00", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"08", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"10", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"18", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"20", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"28", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"30", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"38", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"40", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"48", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"50", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "00", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "00", "1", "2", "3", "4", "5", "6", "7"},
-
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-                {"00", "0F", "1", "2", "3", "4", "5", "6", "7"},
-
-
-        };
-    }
+    private ButtonListener buttonListener;
+    private view.TableModel model;
 
     public JMainWindow(final MenuBar menuBar) {
         this.menuBar = menuBar;
-        listener = new Listener(this, menuBar, running);
+        buttonListener = new ButtonListener(this, menuBar, running);
         hauptFenster = new JFrame("PicSim 0.1");
         container = hauptFenster.getContentPane();
         container.setLayout(new BorderLayout());
@@ -99,7 +67,9 @@ public class JMainWindow implements ActionListener {
         scrollPane.setVisible(true);//Alles sichtbar machen
 
         //Scrollbar und Tabelle für Register
-        JTable tablereg = new JTable( rowData, columnNames );
+
+        model = new view.TableModel();
+        tablereg = new JTable(model);
         tablereg.setEnabled(false);
         JScrollPane scrolltable = new JScrollPane(tablereg);
         scrolltable.setPreferredSize(new Dimension(250,300));
@@ -153,9 +123,6 @@ public class JMainWindow implements ActionListener {
         ra.add(pineight);
         ra.add(ratable);
         ra.add(rbtable);
-        //ra.add(new Boolean(false));
-
-
 
         //Hauptfenster mit Attributen ausstatten
         hauptFenster.setSize(1024, 620);
@@ -167,16 +134,12 @@ public class JMainWindow implements ActionListener {
         timer = new Timer(DELAY, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-
-                System.out.println("W-Register:" + menuBar.register.getW());
                 step();
-                //hauptFenster.repaint();
             }
         });
     }
 
     private void JMenuBar() {
-
         // Menüleiste erzeugen
         menueLeiste = new JMenuBar();
 
@@ -184,7 +147,6 @@ public class JMainWindow implements ActionListener {
         datei = new JMenu("Datei");
         optionen = new JMenu("Optionen");
         hilfe = new JMenu("Hilfe");
-
 
         // Untermenüelemente erzeugen
         oeffnen = new JMenuItem("Öffnen");
@@ -262,7 +224,7 @@ public class JMainWindow implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent object) {
-        listener.actionPerformed(object);
+        buttonListener.actionPerformed(object);
     }
 
     //Führt nächsten Befehl im Programm aus
@@ -282,10 +244,10 @@ public class JMainWindow implements ActionListener {
     public void toggleRunning() {
         if (this.running) {
             stop();
+            stepButton.setEnabled(true);
         } else {
             start();
-
-
+            stepButton.setEnabled(false);
         }
     }
 
@@ -305,13 +267,24 @@ public class JMainWindow implements ActionListener {
         startStopButton.setToolTipText("Programm starten");
     }
 
-public void setStepbutton(){}
-public void getStepbutton(){}
-public void setRunbutton(){}
-public void getRunbutton(){}
+    public void loadwindow(){
+        hauptFenster.repaint();
+    }
 
-public void loadwindow(){hauptFenster.repaint();}
-public void setwreg(){wreg.setText(String.valueOf(menuBar.register.getW()));}
-public void setpcl(){
-    pc.setText(String.valueOf(menuBar.register.getPC()));}
+    public void setwreg(){
+        wreg.setText(String.valueOf(Integer.toHexString(menuBar.register.getW())));
+    }
+
+    public void setpcl(){
+    pc.setText(String.valueOf(menuBar.register.getPC()));
+    }
+
+    @Override
+    public void update(UpdateGUIEvent event) {
+        int address = event.getAddress();
+        int row = (address/8);
+        int column = address%8;
+        int value = event.getValue();
+        model.setValueAt(value, row, column);
+    }
 }

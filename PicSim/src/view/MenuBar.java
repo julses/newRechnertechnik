@@ -2,10 +2,7 @@ package view;
 
 import exceptions.NoInstructionException;
 import exceptions.NoRegisterAddressException;
-import model.Converter;
-import model.Pars;
-import model.Register;
-import model.Scan;
+import model.*;
 
 import javax.swing.*;
 import java.io.IOException;

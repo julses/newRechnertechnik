@@ -11,9 +11,6 @@ import java.math.BigInteger;
  */
 public class Converter {
 
-    public Converter() {
-    }
-
     public String hexStringToBinString(String hex) {
         String var = new BigInteger(hex, 16).toString(2);   //Umrechnung in Binärzahl
         if(var.length()<16){

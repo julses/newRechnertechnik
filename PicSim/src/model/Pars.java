@@ -16,8 +16,8 @@ public class Pars {
     // ByteToken
     public static final int TOK_ADDWF = 0x0700;
     public static final int TOK_ANDWF = 0x0500;
-    //    public static final int TOK_CLRF = 0x0180;
-    //    public static final int TOK_CLRW = 0x0100;
+    //public static final int TOK_CLRF = 0x0180; Nicht nötig, siehe 2 drunter
+    //public static final int TOK_CLRW = 0x0100; Nicht nötig, siehe 1 drunter
     public static final int TOK_CLRF_CLRW = 0x0100;
     public static final int TOK_COMF = 0x0900;
     public static final int TOK_DECF = 0x0300;
@@ -26,8 +26,8 @@ public class Pars {
     public static final int TOK_INCFSZ = 0x0F00;
     public static final int TOK_IORWF = 0x0400;
     public static final int TOK_MOVF = 0x0800;
-    //    public static final int TOK_MOVWF = 0x0080;
-    //    public static final int TOK_NOP = 0x0000;
+    //public static final int TOK_MOVWF = 0x0080; Nicht nötig, siehe 2 drunter
+    //public static final int TOK_NOP = 0x0000;   Nicht nötig, siehe 1 drunter
     public static final int TOK_MOVWF_NOP = 0x0000;
     public static final int TOK_RLF = 0x0D00;
     public static final int TOK_RRF = 0x0C00;

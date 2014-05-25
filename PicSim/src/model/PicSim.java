@@ -23,7 +23,7 @@ public class PicSim {
         Scan scanner = new Scan(register);
         Pars parser = new Pars(operations);
         MenuBar menubar = new MenuBar(parser, scanner, register);
-        new JMainWindow(menubar);
+        register.addGUIListener(new JMainWindow (menubar));
     }
 
 }

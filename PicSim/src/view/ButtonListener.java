@@ -14,13 +14,13 @@ import static view.Objects.*;
  * Time: 11:06
  * To change this template use File | Settings | File Templates.
  */
-public class Listener implements ActionListener {
+public class ButtonListener implements ActionListener {
 
     private final MenuBar menuBar;
     private boolean running;
     private JMainWindow mainWindow;
 
-    public Listener(JMainWindow jMainWindow, MenuBar menuBar, boolean running) {
+    public ButtonListener(JMainWindow jMainWindow, MenuBar menuBar, boolean running) {
         this.menuBar = menuBar;
         this.running = running;
         this.mainWindow = jMainWindow;

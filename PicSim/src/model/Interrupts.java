@@ -15,5 +15,5 @@ public class Interrupts {
         this.register = register;
     }
 
-    //Taster und TMR0 blabla
+    //Taster und TMR0
 }

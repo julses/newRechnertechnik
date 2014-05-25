@@ -151,12 +151,25 @@ public class OperationsTest {
         Assert.assertEquals(0x2, register.getW());
         Assert.assertEquals(4, register.getPC());
     }
-/*
+
     @org.junit.Test
     public void testIorwf() throws Exception {
-
+        /*
+         *Before Instruction    After Instruction
+         * RESULT = 0x13        RESULT = 0x13
+         * W = 0x91             W = 0x93
+         *                      Z = 1
+         */
+        int instruction = 0x040c;
+        register.setRegValue(0x0c, 0x13);
+        register.setW(0x91);
+        pars.exec(instruction, pars.decode(instruction));
+        Assert.assertEquals(0x13, register.getRegValue(0x0c));
+        Assert.assertEquals(0x93, register.getW());
+        //Why has the Bit to be true? - Example is from PIC-Manual
+        //Assert.assertTrue(register.getZeroBit());
     }
-*/
+
     @Test
     public void testMovf() throws Exception {
         int instruction = 0x0884;
@@ -354,10 +367,15 @@ public class OperationsTest {
 */
     @Test
     public void testIorlw() throws Exception {
+        /*
+         *Before Instruction    After Instruction
+         * W = 0x9A              W = 0xBF
+         *                       Z = 1
+         */
         register.setW(0x9A);
         pars.exec(0x3835, pars.decode(0x3835));
         Assert.assertEquals(0xBF, register.getW());
-        // TODO : Why has the Bit to be true? - Example is from PIC-Manual
+        //Why has the Bit to be true? - Example is from PIC-Manual
         //Assert.assertTrue(register.getZeroBit());
     }
 

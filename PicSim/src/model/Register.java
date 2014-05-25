@@ -2,6 +2,10 @@ package model;
 
 
 import exceptions.NoRegisterAddressException;
+import view.update.GUIListener;
+import view.update.UpdateGUIEvent;
+
+import javax.swing.event.EventListenerList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,16 +43,20 @@ public class Register {
     public static final int GPR_END = 0x2F;
     //***********************************
 
+    public static final int SFR = 0;
+    public static final int GPR = 1;
+
     private Stack stack;
     private int cycles;
     private int w; //W-Register
     private int[] reg;
     private int latchPortA;
     private int latchPortB;
-
+    private EventListenerList listeners;
 
     public Register(Stack stack) {
         this.stack = stack;
+        listeners = new EventListenerList();
         cycles = 0;
         reg = new int[0xFF];
 
@@ -58,6 +66,7 @@ public class Register {
     //Power On Reset bei laden einer Datei
     public void valueOnReset(){
         try {
+            //Clear W
             w = 0;
             //Clear Stack
             stack.clear();
@@ -89,13 +98,13 @@ public class Register {
             case PORTA:
                 reg[PORTA] = value;
                 latchPortA = value;
-                //TODO : Ausgabe
+                notifyUpdateGUI(new UpdateGUIEvent(this, SFR, selectBank(address), value));
                 break;
 
             case PORTB:
                 reg[PORTB] = value;
                 latchPortB = value;
-                //TODO : Ausgabe
+                notifyUpdateGUI(new UpdateGUIEvent(this, SFR, selectBank(address), value));
                 break;
             default:
                 writeRegValue(address, value);
@@ -113,20 +122,12 @@ public class Register {
         if ((address & 0x7F) > GPR_END) {
             return;
         }
-
-        if (isGPRAddr(address)) {
+        //Überprüung ob es sich um GPR (General Purpose Registers) Adresse handelt
+        if (((address & 0x7F) >= GPR_START) && (address & 0x7F) <= GPR_END) {
             writeGPR(address, value);
         } else {
             writeSFR(address, value);
         }
-    }
-
-    //Überprüft ob es sich um GPR (General Purpose Registers) Adresse handelt
-    public boolean isGPRAddr(int address) {
-        if (((address & 0x7F) >= GPR_START) && (address & 0x7F) <= GPR_END) {
-            return true;
-        }
-        return false;
     }
 
     private void writeGPR(int address, int value) {
@@ -134,7 +135,8 @@ public class Register {
         reg[address & 0x7F] = value;
         // Vorderes Bit durch Veroderung hinzufügen
         reg[address | 0x80] = value;
-        //TODO : Ausgabe
+        //GUI updaten
+        notifyUpdateGUI(new UpdateGUIEvent(this, GPR, selectBank(address), value));
     }
 
     private void writeSFR(int addr, int value) {
@@ -148,14 +150,12 @@ public class Register {
                 //indirekte Adressierung
                 writeGPR(reg[FSR], value);
                 break;
-
             //PCL spiegeln
             case PCL:
             case PCL + OFFSET:
                 reg[PCL] = value;
                 reg[PCL + OFFSET] = value;
                 break;
-
             //STATUS spiegeln
             case STATUS:
             case STATUS + OFFSET:
@@ -163,58 +163,65 @@ public class Register {
                 reg[STATUS] = value;
                 reg[STATUS + OFFSET] = value;
                 break;
-
             //FSR spiegeln
             case FSR:
             case FSR + OFFSET:
                 reg[FSR] = value;
                 reg[FSR + OFFSET] = value;
                 break;
-
             //PORT A Ausgänge schreiben (TRIS A Reg = 0 --> ausgang)
             case PORTA:
                 latchPortA = value;
                 reg[PORTA] = (value & 0x1F) & ~reg[TRISA];
                 break;
-
             //PORT B Ausgänge schreiben (TRIS B Reg = 0 --> ausgang)
             case PORTB:
                 latchPortB = value;
                 reg[PORTB] = value & ~reg[TRISB];
                 break;
-
             case TRISA:
                 value = value & 0x1F;
                 reg[TRISA] = value;
                 reg[PORTA] = latchPortA & ~reg[TRISA];
-                //TODO : GUI benachrichtigen
+                //GUI updaten
+                notifyUpdateGUI(new UpdateGUIEvent(this, SFR, PORTA, latchPortA & ~reg[TRISA]));
                 break;
-
             case TRISB:
                 reg[TRISB] = value;
                 reg[PORTB] = latchPortB & ~reg[TRISB];
-                //TODO : GUI benachrichtigen
+                //GUI updaten
+                notifyUpdateGUI(new UpdateGUIEvent(this, SFR, PORTB, latchPortB & ~reg[TRISB]));
                 break;
-
             //PCLATH spiegeln
             case PCLATH:
             case PCLATH + OFFSET:
                 reg[PCLATH] = value;
                 reg[PCLATH + OFFSET] = value;
                 break;
-
             //INTCON spiegeln
             case INTCON:
             case INTCON + OFFSET:
                 reg[INTCON] = value;
                 reg[INTCON + OFFSET] = value;
                 break;
-
             default:
                 //nicht spiegeln
                 reg[addr] = value;
         }
-        //TODO : GUI benachrichtigen
+        //GUI updaten. 0=SFR, 1=GPR!!!
+        notifyUpdateGUI(new UpdateGUIEvent(this, SFR, selectBank(addr), value));
+    }
+
+
+    public void addGUIListener( GUIListener listener )
+    {
+        listeners.add( GUIListener.class, listener );
+    }
+
+    protected synchronized void notifyUpdateGUI( UpdateGUIEvent event )
+    {
+        for ( GUIListener l : listeners.getListeners( GUIListener.class ) )
+            l.update(event);
     }
 
     //Addresse an gewählte Bank anpassen

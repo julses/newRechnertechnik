@@ -1,6 +1,8 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 /**
@@ -11,7 +13,7 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class Objects {
-    public static Object[][] rowData;
+    public static Object[] rowData;
     public static String[] columnNames;
 
 
@@ -58,4 +60,7 @@ public class Objects {
     public static JLabel labelpc;
     public static JLabel labelacc;
     public static JLabel labelwreg;
+
+    public static AbstractTableModel model;
+    public static JTable tablereg;
 }
