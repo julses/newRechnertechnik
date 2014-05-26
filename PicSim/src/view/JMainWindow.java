@@ -8,6 +8,7 @@ import view.update.GUIListener;
 import view.update.UpdateGUIEvent;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +25,7 @@ import static view.Objects.*;
 
 public class JMainWindow implements ActionListener, GUIListener {
 
+    private static final Color Grau = new Color(238, 238, 238);//Grau fuer die Tabellenspalte 1 + Register
     private static final int DELAY = 50; // 1/100th second
     public static boolean running;
     public static Timer timer;
@@ -39,7 +41,7 @@ public class JMainWindow implements ActionListener, GUIListener {
         container.setLayout(new BorderLayout());
 
         GridLayout buttonLayout = new GridLayout(10,1,5,10);// Layout für das Buttonpanel /Spallten/Zeilen /xAbstand/yAbstand
-        GridLayout check=new GridLayout(8,4);
+        GridLayout check=new GridLayout(10,2);
         JPanel ra = new JPanel();
         JPanel pone=new JPanel();//Panel für das Textfeld des Codes
         JPanel two = new JPanel();//Panel für Buttons
@@ -57,7 +59,7 @@ public class JMainWindow implements ActionListener, GUIListener {
         // Textfeld für Lst-File erzeugen
         lstFile = new JTextArea("Bitte wählen sie eine .LST Datei aus.");//Textarea mit Text erstellen
         JScrollPane scrollPane = new JScrollPane(lstFile);//Scrollbar mit oberfläche verknüpfen
-        lstFile.setEnabled(false);//textfeld nich veraenderbar
+        lstFile.setEditable(false);//textfeld nich veraenderbar
         scrollPane.setPreferredSize(new Dimension(600, 200));//Scrollbar hinzufügen
         pone.add(scrollPane);//Texfeld mit Scrollbar dem
         scrollPane.setVisible(true);//Alles sichtbar machen
@@ -66,6 +68,26 @@ public class JMainWindow implements ActionListener, GUIListener {
 
         model = new view.TableModel();
         tablereg = new JTable(model);
+        tablereg.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table,
+                                                           Object value, boolean isSelected, boolean hasFocus,
+                                                           int row, int column) {
+
+                Component c = super.getTableCellRendererComponent(table, value,
+                        isSelected, hasFocus, row, column);
+
+                    if (row < 32 && column==0) {
+
+                        setBackground(Grau);
+                        row++;
+                    } else {
+                        setBackground(Color.WHITE);
+                    }
+
+                return this;
+            }
+        });
         tablereg.setEnabled(false);
         JScrollPane scrolltable = new JScrollPane(tablereg);
         scrolltable.setPreferredSize(new Dimension(250,300));
@@ -77,14 +99,23 @@ public class JMainWindow implements ActionListener, GUIListener {
         labelSFR=new JLabel("SFR:");
         labelwreg=new JLabel("W:");
 
-        SFR = new JTextField("",5);
+        platzhalter= new JTextField("",8);
+        platzhalter.setVisible(false);
+
+        SFR = new JTextField("",4);
+
         SFR.setEnabled(false);
 
-        pc = new JTextField("",5);
-        pc.setEnabled(false);
+        pc = new JTextField("",4);
+        pc.setEditable(false);
+        pc.setForeground(Color.BLACK);
+        pc.setBackground(Grau);
 
-        wreg=new JTextField("",5);
-        wreg.setEnabled(false);
+
+        wreg=new JTextField("",4);
+        wreg.setEditable(false);
+        wreg.setForeground(Color.BLACK);
+        wreg.setBackground(Grau);
 
         //Panels dem Hauptfenster hinzufügen
         container.add(menueLeiste,BorderLayout.NORTH);
@@ -108,8 +139,9 @@ public class JMainWindow implements ActionListener, GUIListener {
         reg.add(pc);
         reg.add(labelwreg);
         reg.add(wreg);
-        reg.add(labelSFR);
-        reg.add(SFR);
+        reg.add(platzhalter);
+        //reg.add(labelSFR);
+        //reg.add(SFR);
 
         //JPanel P bekommt verschiedene Pins zugewiesen
         ra.add(zeroA);
@@ -117,6 +149,10 @@ public class JMainWindow implements ActionListener, GUIListener {
         ra.add(twoA);
         ra.add(threeA);
         ra.add(fourA);
+        ra.add(fiveA);
+        ra.add(sixA);
+        ra.add(sevenA);
+
         ra.add(zeroB);
         ra.add(oneB);
         ra.add(twoB);
@@ -128,7 +164,7 @@ public class JMainWindow implements ActionListener, GUIListener {
 
 
         //Hauptfenster mit Attributen ausstatten
-        hauptFenster.setSize(1024, 620);
+        hauptFenster.setSize(1024, 640);
         hauptFenster.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //hauptFenster.pack();//Passt Buttons an
         hauptFenster.setVisible(true);
@@ -193,6 +229,19 @@ public class JMainWindow implements ActionListener, GUIListener {
         //pinfourButton erzeugen und einem ActionListener zuweisen
         fourA = new JCheckBox("RA4");
         fourA.addActionListener(this);
+
+        fiveA = new JCheckBox("RA4");
+        fiveA.setVisible(false);
+        fiveA.addActionListener(this);
+
+        sixA = new JCheckBox("RA4");
+        sixA.setVisible(false);
+        sixA.addActionListener(this);
+
+        sevenA = new JCheckBox("RA4");
+        sevenA.setVisible(false);
+        sevenA.addActionListener(this);
+
         //pinfiveButton erzeugen und einem ActionListener zuweisen
         zeroB = new JCheckBox("RB0");
         zeroB.addActionListener(this);
@@ -290,7 +339,7 @@ public class JMainWindow implements ActionListener, GUIListener {
     }
 
     public void setpcl(){
-    pc.setText(String.valueOf(Integer.toHexString(menuBar.register.getPC()-1)));
+    pc.setText(String.valueOf(menuBar.register.getPC()));
     }
     public void setSFR() throws NoRegisterAddressException {
         SFR.setText(String.valueOf(menuBar.register.getRegValue(Register.FSR)));

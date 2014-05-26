@@ -30,6 +30,9 @@ public class Objects {
     public static JCheckBox twoA;
     public static JCheckBox threeA;
     public static JCheckBox fourA;
+    public static JCheckBox fiveA;
+    public static JCheckBox sixA;
+    public static JCheckBox sevenA;
 
     public static JCheckBox zeroB;
     public static JCheckBox oneB;
@@ -64,6 +67,7 @@ public class Objects {
     public static JTextField pc;
     public static JTextField SFR;
     public static JTextField wreg;
+    public static JTextField platzhalter;
 
     public static JLabel labelpc;
     public static JLabel labelSFR;

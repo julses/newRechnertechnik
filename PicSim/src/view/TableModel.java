@@ -10,19 +10,24 @@ import javax.swing.table.AbstractTableModel;
  * To change this template use File | Settings | File Templates.
  */
 public class TableModel extends AbstractTableModel {
-    public String[][] row = new String[50][50] ;
-
-    //Erstellt eine Tabelle mit allen Registern
+    public String[][] row = new String[32][32] ;
+    public int leiste=0;
     public TableModel() {
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 8; j++) {
-                row[i][j] = "0";
+        for (int i = 0; i < 32; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (j==0) {
+                    row[i][j] = Integer.toHexString(leiste);
+                    leiste=leiste+8;
+                }
+                else {
+                 row[i][j] ="0";
+                }
             }
         }
     }
 
     public int getColumnCount() {
-        return 8;
+        return 9;
     }
 
     public int getRowCount() {
@@ -33,20 +38,22 @@ public class TableModel extends AbstractTableModel {
     public String getColumnName(int column) {
         switch (column) {
             case 0:
-                return "00";
+                return "  ";
             case 1:
-                return "01";
+                return "00";
             case 2:
-                return "02";
+                return "01";
             case 3:
-                return "03";
+                return "02";
             case 4:
-                return "04";
+                return "03";
             case 5:
-                return "05";
+                return "04";
             case 6:
-                return "06";
+                return "05";
             case 7:
+                return "06";
+            case 8:
                 return "07";
             default:
                 return null;

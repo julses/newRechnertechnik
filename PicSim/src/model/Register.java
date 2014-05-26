@@ -106,6 +106,7 @@ public class Register {
                 latchPortB = value;
                 notifyUpdateGUI(new UpdateGUIEvent(this, false, selectBank(address), value));
                 break;
+
             default:
                 writeRegValue(address, value);
         }
@@ -228,6 +229,14 @@ public class Register {
     private int selectBank(int address) {
         int bankMask = ((reg[STATUS] & 0x20) << 2);
         return bankMask | address;
+    }
+
+    public int getRegAlone(int address) throws NoRegisterAddressException {
+        //Adressüberprüfung
+        if (address > REG_MAX) {
+            throw new NoRegisterAddressException(address);
+        }
+        return reg[address];
     }
 
     //Gibt den Wert einer Addresse zurück
