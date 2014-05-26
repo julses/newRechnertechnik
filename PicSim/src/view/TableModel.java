@@ -12,6 +12,7 @@ import javax.swing.table.AbstractTableModel;
 public class TableModel extends AbstractTableModel {
     public String[][] row = new String[50][50] ;
 
+    //Erstellt eine Tabelle mit allen Registern
     public TableModel() {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 8; j++) {

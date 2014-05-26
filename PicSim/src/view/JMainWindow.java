@@ -290,7 +290,7 @@ public class JMainWindow implements ActionListener, GUIListener {
     }
 
     public void setpcl(){
-    pc.setText(String.valueOf(menuBar.register.getPC()));
+    pc.setText(String.valueOf(Integer.toHexString(menuBar.register.getPC()-1)));
     }
     public void setSFR() throws NoRegisterAddressException {
         SFR.setText(String.valueOf(menuBar.register.getRegValue(Register.FSR)));
@@ -303,7 +303,8 @@ public class JMainWindow implements ActionListener, GUIListener {
         if (event.getCheckIO()) {
             checkTris(address, value);
         } else {
-            if(address == (Register.PORTA | Register.PORTB)) checkPorts(address, value);
+            if(address == Register.PORTA) checkPortsA(value);
+            if(address == Register.PORTB) checkPortsB(value);
             int row = (address/8);
             int column = (address%8)+1;
             String stringValue = Integer.toHexString(event.getValue());
@@ -336,45 +337,46 @@ public class JMainWindow implements ActionListener, GUIListener {
             else threeB.setEnabled(false);
             if(menuBar.register.testBit(value, 4)) fourB.setEnabled(true);
             else fourB.setEnabled(false);
-            if(menuBar.register.testBit(value, 4)) fourB.setEnabled(true);
-            else fourB.setEnabled(false);
-            if(menuBar.register.testBit(value, 4)) fourB.setEnabled(true);
-            else fourB.setEnabled(false);
-            if(menuBar.register.testBit(value, 4)) fourB.setEnabled(true);
-            else fourB.setEnabled(false);
+            if(menuBar.register.testBit(value, 5)) fiveB.setEnabled(true);
+            else fiveB.setEnabled(false);
+            if(menuBar.register.testBit(value, 6)) sixB.setEnabled(true);
+            else sixB.setEnabled(false);
+            if(menuBar.register.testBit(value, 7)) sevenB.setEnabled(true);
+            else sevenB.setEnabled(false);
         }
     }
 
-    private void checkPorts(int address, int value) {
-        if(address == Register.PORTA) {
-            //PORT A change checkBox
-            if(menuBar.register.testBit(value, 0)) zeroA.setSelected(true);
-            else zeroA.setSelected(false);
-            if(menuBar.register.testBit(value, 1)) oneA.setSelected(true);
-            else oneA.setSelected(false);
-            if(menuBar.register.testBit(value, 2)) twoA.setSelected(true);
-            else twoA.setSelected(false);
-            if(menuBar.register.testBit(value, 3)) threeA.setSelected(true);
-            else threeA.setSelected(false);
-            if(menuBar.register.testBit(value, 4)) fourA.setSelected(true);
-            else fourA.setSelected(false);
-        } else {
-            if(menuBar.register.testBit(value, 0)) zeroB.setSelected(true);
-            else zeroB.setSelected(false);
-            if(menuBar.register.testBit(value, 1)) oneB.setSelected(true);
-            else oneB.setSelected(false);
-            if(menuBar.register.testBit(value, 2)) twoB.setSelected(true);
-            else twoB.setSelected(false);
-            if(menuBar.register.testBit(value, 3)) threeB.setSelected(true);
-            else threeB.setSelected(false);
-            if(menuBar.register.testBit(value, 4)) fourB.setSelected(true);
-            else fourB.setSelected(false);
-            if(menuBar.register.testBit(value, 5)) fiveB.setSelected(true);
-            else fiveB.setSelected(false);
-            if(menuBar.register.testBit(value, 6)) sixB.setSelected(true);
-            else sixB.setSelected(false);
-            if(menuBar.register.testBit(value, 7)) sevenB.setSelected(true);
-            else sevenB.setSelected(false);
-        }
+    private void checkPortsA(int value) {
+        //PORT A change checkBox
+        if(menuBar.register.testBit(value, 0)) zeroA.setSelected(true);
+        else zeroA.setSelected(false);
+        if(menuBar.register.testBit(value, 1)) oneA.setSelected(true);
+        else oneA.setSelected(false);
+        if(menuBar.register.testBit(value, 2)) twoA.setSelected(true);
+        else twoA.setSelected(false);
+        if(menuBar.register.testBit(value, 3)) threeA.setSelected(true);
+        else threeA.setSelected(false);
+        if(menuBar.register.testBit(value, 4)) fourA.setSelected(true);
+        else fourA.setSelected(false);
     }
+
+    private void checkPortsB(int value) {
+        if(menuBar.register.testBit(value, 0)) zeroB.setSelected(true);
+        else zeroB.setSelected(false);
+        if(menuBar.register.testBit(value, 1)) oneB.setSelected(true);
+        else oneB.setSelected(false);
+        if(menuBar.register.testBit(value, 2)) twoB.setSelected(true);
+        else twoB.setSelected(false);
+        if(menuBar.register.testBit(value, 3)) threeB.setSelected(true);
+        else threeB.setSelected(false);
+        if(menuBar.register.testBit(value, 4)) fourB.setSelected(true);
+        else fourB.setSelected(false);
+        if(menuBar.register.testBit(value, 5)) fiveB.setSelected(true);
+        else fiveB.setSelected(false);
+        if(menuBar.register.testBit(value, 6)) sixB.setSelected(true);
+        else sixB.setSelected(false);
+        if(menuBar.register.testBit(value, 7)) sevenB.setSelected(true);
+        else sevenB.setSelected(false);
+    }
+
 }

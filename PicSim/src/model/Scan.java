@@ -35,11 +35,12 @@ public class Scan {
         this.register = register;
     }
 
+    //Setzt Pfad zu Quelldatei
     public void setPathToLSTFile(Path pathToLSTFile) {
         this.pathToLSTFile = pathToLSTFile;
     }
 
-
+    //Liest Datei ein und schreibt Befehle in eine Hexcode Liste
     public void reader() throws IOException {
         hexCode = new ArrayList<String>();
         register.valueOnReset();
@@ -69,7 +70,7 @@ public class Scan {
         br.close();
     }
 
-
+    //Überprüft einen String ob es hexcode ist
     private boolean isHexValue(String val) {
         Matcher matcher = PATTERN.matcher(val);
         if (matcher.matches()) {
@@ -79,7 +80,7 @@ public class Scan {
         }
     }
 
-
+    //Schreibt Befehle in eine txt Datei
     private void dotxt(List<String> CodeListe, String dateiName) throws IOException{
         //Erstellen einer .txt
         FileWriter fw = null;
@@ -112,10 +113,12 @@ public class Scan {
         }
     }*/
 
+    //Gibt den Befehl an der der PC steht zurück
     public String getOper() {
         return hexCode.get(register.getPC());
     }
 
+    //Setzt den PIC zurück
     public void reset() {
         register.valueOnReset();
     }

@@ -10,7 +10,7 @@ import exceptions.NoRegisterAddressException;
  * Time: 13:48
  * To change this template use File | Settings | File Templates.
  */
-
+//Der Parser dient als Decoder und soll die Befehle erkennen
 public class Pars {
 
     // ByteToken

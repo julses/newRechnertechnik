@@ -242,7 +242,7 @@ public class Register {
             //Indirekte Adressierung
             case INDF:
             case INDF + OFFSET:
-                return reg[reg[FSR]];
+                return reg[FSR];
 
             //PORT A Eingänge lesen (TRIS A Reg = 1 --> eingang)
             case PORTA:
