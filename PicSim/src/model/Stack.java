@@ -36,7 +36,4 @@ public class Stack {
         stack = new int[8];
     }
 
-    public int[] getStackArray() {
-        return stack;
-    }
 }

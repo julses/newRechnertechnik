@@ -26,7 +26,7 @@ import static view.Objects.*;
 public class JMainWindow implements ActionListener, GUIListener {
 
     private static final Color Grau = new Color(238, 238, 238);//Grau fuer die Tabellenspalte 1 + Register
-    private static final int DELAY = 50; // 1/100th second
+    private static int DELAY = 50; // 1/100th second
     public static boolean running;
     public static Timer timer;
     private MenuBar menuBar;
@@ -339,10 +339,10 @@ public class JMainWindow implements ActionListener, GUIListener {
     }
 
     public void setpcl(){
-    pc.setText(String.valueOf(menuBar.register.getPC()));
+        pc.setText(String.valueOf(Integer.toHexString(menuBar.register.getPC()-1)));
     }
     public void setSFR() throws NoRegisterAddressException {
-        SFR.setText(String.valueOf(menuBar.register.getRegValue(Register.FSR)));
+        SFR.setText(String.valueOf(Integer.toHexString(menuBar.register.getRegValue(Register.FSR))));
     }
 
     @Override
@@ -362,7 +362,7 @@ public class JMainWindow implements ActionListener, GUIListener {
     }
 
     private void checkTris(int address, int value) {
-        if(address == Register.TRISA) {
+        if(address == (Register.TRISA | Register.PORTA)) {
             //TRIS A I/O change
             if(menuBar.register.testBit(value, 0)) zeroA.setEnabled(true);
             else zeroA.setEnabled(false);

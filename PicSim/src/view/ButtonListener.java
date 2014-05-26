@@ -97,121 +97,82 @@ public class ButtonListener implements ActionListener {
         }
 
         if (object.getSource() == zeroA) {
-            int value = 0;
-            try {value = (menuBar.register.getRegAlone(Register.PORTA) & 0x1F);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
-            if(zeroA.isSelected()==true) value = menuBar.register.setBit(value, 0);
-            else value =menuBar.register.clearBit(value, 0);
-            try {menuBar.register.setRegValue(Register.PORTA, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(zeroA.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTA, selected, 0);
         }
         if (object.getSource() == oneA) {
-            int value = 0;
-            try {value = (menuBar.register.getRegAlone(Register.PORTA) & 0x1F);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(oneA.isSelected()==true) value = menuBar.register.setBit(value, 1);
-            else value =menuBar.register.clearBit(value, 1);
-            try {menuBar.register.setRegValue(Register.PORTA, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(oneA.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTA, selected, 1);
         }
         if (object.getSource() == twoA) {
-            int value = 0;
-            try { value = (menuBar.register.getRegAlone(Register.PORTA) & 0x1F);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(twoA.isSelected()==true) value = menuBar.register.setBit(value, 2);
-            else value =menuBar.register.clearBit(value, 2);
-            try {menuBar.register.setRegValue(Register.PORTA, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(twoA.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTA, selected, 2);
         }
         if (object.getSource() == threeA) {
-            int value = 0;
-            try { value = (menuBar.register.getRegAlone(Register.PORTA) & 0x1F);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(threeA.isSelected()==true) value = menuBar.register.setBit(value, 3);
-            else value =menuBar.register.clearBit(value, 3);
-            try {menuBar.register.setRegValue(Register.PORTA, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(threeA.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTA, selected, 3);
         }
         if (object.getSource() == fourA) {
-            int value = 0;
-            try { value = (menuBar.register.getRegAlone(Register.PORTA) & 0x1F);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(fourA.isSelected()==true) value = menuBar.register.setBit(value, 4);
-            else value =menuBar.register.clearBit(value, 4);
-            try {menuBar.register.setRegValue(Register.PORTA, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(fourA.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTA, selected, 4);
         }
         if (object.getSource() == zeroB) {
-            int value = 0;
-            try { value = menuBar.register.getRegAlone(Register.PORTB);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(zeroB.isSelected()==true) value = menuBar.register.setBit(value, 0);
-            else value =menuBar.register.clearBit(value, 0);
-            try {menuBar.register.setRegValue(Register.PORTB, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(zeroB.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTB, selected, 0);
         }
         if (object.getSource() == oneB) {
-            int value = 0;
-            try { value = menuBar.register.getRegAlone(Register.PORTB);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(oneB.isSelected()==true) value = menuBar.register.setBit(value, 1);
-            else value =menuBar.register.clearBit(value, 1);
-            try {menuBar.register.setRegValue(Register.PORTB, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(oneB.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTB, selected, 1);
         }
         if (object.getSource() == twoB) {
-            int value = 0;
-            try { value = menuBar.register.getRegAlone(Register.PORTB);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(twoB.isSelected()==true) value = menuBar.register.setBit(value, 2);
-            else value =menuBar.register.clearBit(value, 2);
-            try {menuBar.register.setRegValue(Register.PORTB, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(twoB.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTB, selected, 2);
         }
         if (object.getSource() == threeB) {
-            int value = 0;
-            try { value = menuBar.register.getRegAlone(Register.PORTB);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(threeB.isSelected()==true) value = menuBar.register.setBit(value, 3);
-            else value =menuBar.register.clearBit(value, 3);
-            try {menuBar.register.setRegValue(Register.PORTB, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(threeB.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTB, selected, 3);
         }
         if (object.getSource() == fourB) {
-            int value = 0;
-            try { value = menuBar.register.getRegAlone(Register.PORTB);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(fourB.isSelected()==true) value = menuBar.register.setBit(value, 4);
-            else value =menuBar.register.clearBit(value, 4);
-            try {menuBar.register.setRegValue(Register.PORTB, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(fourB.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTB, selected, 4);
         }
         if (object.getSource() == fiveB) {
-            int value = 0;
-            try { value = menuBar.register.getRegAlone(Register.PORTB);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(fiveB.isSelected()==true) value = menuBar.register.setBit(value, 5);
-            else value =menuBar.register.clearBit(value, 5);
-            try {menuBar.register.setRegValue(Register.PORTB, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(fiveB.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTB, selected, 5);
         }
         if (object.getSource() == sixB) {
-            int value = 0;
-            try { value = menuBar.register.getRegAlone(Register.PORTB);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(sixB.isSelected()==true) value = menuBar.register.setBit(value, 6);
-            else value =menuBar.register.clearBit(value, 6);
-            try {menuBar.register.setRegValue(Register.PORTB, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(sixB.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTB, selected, 6);
         }
         if (object.getSource() == sevenB) {
-            int value = 0;
-            try { value = menuBar.register.getRegAlone(Register.PORTB);}
-            catch (NoRegisterAddressException e) { e.printStackTrace();}
-            if(sevenB.isSelected()==true) value = menuBar.register.setBit(value, 7);
-            else value =menuBar.register.clearBit(value, 7);
-            try {menuBar.register.setRegValue(Register.PORTB, value);}
-            catch (NoRegisterAddressException e) {e.printStackTrace();}
+            boolean selected;
+            if(sevenB.isSelected()) selected=true;
+            else selected=false;
+            menuBar.register.setPort(Register.PORTB, selected, 7);
         }
     }
 }

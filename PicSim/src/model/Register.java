@@ -93,42 +93,39 @@ public class Register {
         }
     }
 
-    public void setRegValue(int address, int value) throws NoRegisterAddressException {
-        switch (address) {
-            case PORTA:
-                reg[PORTA] = value;
-                latchPortA = value;
-                notifyUpdateGUI(new UpdateGUIEvent(this, false, selectBank(address), value));
-                break;
-
-            case PORTB:
-                reg[PORTB] = value;
-                latchPortB = value;
-                notifyUpdateGUI(new UpdateGUIEvent(this, false, selectBank(address), value));
-                break;
-
-            default:
-                writeRegValue(address, value);
+    public void setPort(int address, boolean selected, int bit) {
+        int value;
+        if (address == PORTA) value = (reg[address] & 0x1F);
+        else value = reg[address];
+        if(selected) value = setBit(value, bit);
+        else value = clearBit(value, bit);
+        if (address == PORTA) {
+            reg[PORTA] = value;
+            latchPortA = value;
+            notifyUpdateGUI(new UpdateGUIEvent(this, false, PORTA, value));
+        } else {
+            reg[PORTB] = value;
+            latchPortB = value;
+            notifyUpdateGUI(new UpdateGUIEvent(this, false, PORTB, value));
         }
     }
 
-    //Schreibt in Adresse des Registers
-    public void writeRegValue(int address, int value) throws NoRegisterAddressException{
-        //Adressüberprüfung
-        if (address > REG_MAX) {
-            throw new NoRegisterAddressException(address);
-        }
+    public void setRegValue(int address, int value) throws NoRegisterAddressException {
+                //Adressüberprüfung
+                if (address > REG_MAX) {
+                    throw new NoRegisterAddressException(address);
+                }
 
-        //Unseporteten Adressbereich nicht beschreiben
-        if ((address & 0x7F) > GPR_END) {
-            return;
-        }
-        //Überprüung ob es sich um GPR (General Purpose Registers) Adresse handelt
-        if (((address & 0x7F) >= GPR_START) && (address & 0x7F) <= GPR_END) {
-            writeGPR(address, value);
-        } else {
-            writeSFR(address, value);
-        }
+                //Unseporteten Adressbereich nicht beschreiben
+                if ((address & 0x7F) > GPR_END) {
+                    return;
+                }
+                //Überprüung ob es sich um GPR (General Purpose Registers) Adresse handelt
+                if (((address & 0x7F) >= GPR_START) && (address & 0x7F) <= GPR_END) {
+                    writeGPR(address, value);
+                } else {
+                    writeSFR(address, value);
+                }
     }
 
     private void writeGPR(int address, int value) {
@@ -229,14 +226,6 @@ public class Register {
     private int selectBank(int address) {
         int bankMask = ((reg[STATUS] & 0x20) << 2);
         return bankMask | address;
-    }
-
-    public int getRegAlone(int address) throws NoRegisterAddressException {
-        //Adressüberprüfung
-        if (address > REG_MAX) {
-            throw new NoRegisterAddressException(address);
-        }
-        return reg[address];
     }
 
     //Gibt den Wert einer Addresse zurück
