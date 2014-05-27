@@ -4,11 +4,13 @@ import exceptions.NoInstructionException;
 import exceptions.NoRegisterAddressException;
 import model.Register;
 import view.update.GUIListener;
+import view.update.UpdateGUIInfoField;
 import view.update.UpdateGUIRegisterEvent;
 import view.update.UpdateGUIPortsIOEvent;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,7 +33,7 @@ public class JMainWindow implements ActionListener, GUIListener {
     public static Timer timer;
     private MenuBar menuBar;
     private ButtonListener buttonListener;
-    private view.TableModel model;
+    private TableModel model;
 
     public JMainWindow(final MenuBar menuBar) {
         this.menuBar = menuBar;
@@ -65,7 +67,7 @@ public class JMainWindow implements ActionListener, GUIListener {
         scrollPane.setVisible(true);//Alles sichtbar machen
 
         //Scrollbar und Tabelle für Register
-        model = new view.TableModel();
+        model = new RegisterTable();
         tablereg = new JTable(model);
         tablereg.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
@@ -189,11 +191,6 @@ public class JMainWindow implements ActionListener, GUIListener {
         hauptFenster.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //hauptFenster.pack();//Passt Buttons an
         hauptFenster.setVisible(true);
-        setwreg();
-        setpcl();
-        setdc();
-        setZ();
-        setC();
         timer = new Timer(DELAY, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -315,12 +312,6 @@ public class JMainWindow implements ActionListener, GUIListener {
     public void step() {
         try {
             menuBar.step();
-            setwreg();
-            setpcl();
-            setSFR();
-            setC();
-            setdc();
-            setZ();
         } catch (NoInstructionException e) {
             e.printStackTrace();
         } catch (NoRegisterAddressException e) {
@@ -359,26 +350,6 @@ public class JMainWindow implements ActionListener, GUIListener {
 
     public void loadwindow(){
         hauptFenster.repaint();
-    }
-
-    public void setwreg(){
-        wreg.setText(String.valueOf(Integer.toHexString(menuBar.register.getW())));
-    }
-
-    public void setpcl(){
-        pc.setText(String.valueOf(Integer.toHexString(menuBar.register.getPC())));
-    }
-    public void setSFR() throws NoRegisterAddressException {
-        SFR.setText(String.valueOf(Integer.toHexString(menuBar.register.getRegValue(Register.FSR))));
-    }
-    public void setC(){
-        carry.setText(String.valueOf(menuBar.register.testBit(menuBar.register.getRegStatus(), 0)));
-    }
-    public void setdc() {
-        dc.setText(String.valueOf(menuBar.register.testBit(menuBar.register.getRegStatus(), 1)));
-    }
-    public void setZ(){
-        zerobit.setText(String.valueOf(menuBar.register.testBit(menuBar.register.getRegStatus(), 2)));
     }
 
     @Override
@@ -425,6 +396,28 @@ public class JMainWindow implements ActionListener, GUIListener {
                 if(menuBar.register.testBit(value, i)) PortB[i].setSelected(true);
                 else PortB[i].setSelected(false);
             }
+        }
+    }
+
+    @Override
+    public void update(UpdateGUIInfoField event) {
+        int value = event.getValue();
+        switch (event.getField()) {
+            case Register.PC:
+                pc.setText(String.valueOf(Integer.toHexString(value)));
+                break;
+            case Register.W:
+                wreg.setText(String.valueOf(Integer.toHexString(value)));
+                break;
+            case Register.Z:
+                zerobit.setText(String.valueOf(value));
+                break;
+            case Register.C:
+                carry.setText(String.valueOf(value));
+                break;
+            case Register.DC:
+                dc.setText(String.valueOf(value));
+                break;
         }
     }
 }

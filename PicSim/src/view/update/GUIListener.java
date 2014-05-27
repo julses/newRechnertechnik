@@ -12,4 +12,5 @@ import java.util.EventListener;
 public interface GUIListener extends EventListener{
     void update ( UpdateGUIRegisterEvent event);
     void update ( UpdateGUIPortsIOEvent event);
+    void update ( UpdateGUIInfoField event);
 }

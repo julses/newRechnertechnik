@@ -9,10 +9,10 @@ import javax.swing.table.AbstractTableModel;
  * Time: 14:27
  * To change this template use File | Settings | File Templates.
  */
-public class TableModel extends AbstractTableModel {
+public class RegisterTable extends AbstractTableModel {
     public String[][] row = new String[32][32] ;
     public int leiste=0;
-    public TableModel() {
+    public RegisterTable() {
         for (int i = 0; i < 32; i++) {
             for (int j = 0; j < 9; j++) {
                 if (j==0) {

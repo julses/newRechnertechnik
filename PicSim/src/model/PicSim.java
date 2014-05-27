@@ -14,7 +14,6 @@ import java.io.IOException;
  */
 public class PicSim {
 
-
     public static void main(String[] args) throws IOException {
         Stack stack = new Stack();
         Register register = new Register(stack);

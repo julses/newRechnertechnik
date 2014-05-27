@@ -3,6 +3,7 @@ package model;
 
 import exceptions.NoRegisterAddressException;
 import view.update.GUIListener;
+import view.update.UpdateGUIInfoField;
 import view.update.UpdateGUIRegisterEvent;
 import view.update.UpdateGUIPortsIOEvent;
 
@@ -43,6 +44,12 @@ public class Register {
     public static final int GPR_START = 0x0C;
     public static final int GPR_END = 0x2F;
     //***********************************
+    public static final int PC = 0;
+    public static final int W = 1;
+    public static final int Z = 10;
+    public static final int C = 11;
+    public static final int DC = 12;
+
 
     private Stack stack;
     private int cycles;
@@ -264,6 +271,7 @@ public class Register {
         setRegValue(PCLATH, (pc & 0x1F00) >> 8); //0b0001 1111 0000 0000 >> 0b0000 0000 0001 1111
         //Unteren 8 bit im PCL speichern
         setRegValue(PCL, pc & 0x00FF);    //0b0000 0000 1111 1111
+        notifyUpdateGUI(new UpdateGUIInfoField(this, PC, (pc&0x00FF)));
     }
 
     //Inkrementiert den PC
@@ -271,11 +279,14 @@ public class Register {
         //System.out.println("PC++");
         int pc = getPC();
         setPC(++pc);
+        notifyUpdateGUI(new UpdateGUIInfoField(this, PC, pc));
     }
 
     //Setzt W-Register auf gegebenen 8-bit Wert
     public void setW(int value) {
-        this.w = value & 0x00FF;
+        value = value & 0x00FF;
+        this.w = value;
+        notifyUpdateGUI(new UpdateGUIInfoField(this, W, value));
     }
 
     //Gibt den 8-bit Wert des W-Registers zurück
@@ -305,6 +316,10 @@ public class Register {
             }
         }
         setRegValue(STATUS, status);
+        int test;
+        if (testBit(status, 0)) test=1;
+        else test=0;
+        notifyUpdateGUI(new UpdateGUIInfoField(this, C, test));
     }
 
     public void checkDC(int valueF, int valueW, boolean add) throws NoRegisterAddressException {
@@ -324,6 +339,10 @@ public class Register {
             }
         }
         setRegValue(STATUS, status);
+        int test;
+        if (testBit(status, 0)) test=1;
+        else test=0;
+        notifyUpdateGUI(new UpdateGUIInfoField(this, DC, test));
     }
 
     //Testet bei einer Operation ob der Wert 0 ist und setzt je nachdem das Zero Bit
@@ -335,6 +354,10 @@ public class Register {
             status = clearBit(status, 2);
         }
         setRegValue(STATUS, status);
+        int test;
+        if (testBit(status, 0)) test=1;
+        else test=0;
+        notifyUpdateGUI(new UpdateGUIInfoField(this, Z, test));
     }
 
     //Gibt Zero Bit als booleschen Wert zurück
@@ -385,4 +408,9 @@ public class Register {
             l.update(event);
     }
 
+    protected synchronized void notifyUpdateGUI( UpdateGUIInfoField event )
+    {
+        for ( GUIListener l : listeners.getListeners( GUIListener.class ) )
+            l.update(event);
+    }
 }
