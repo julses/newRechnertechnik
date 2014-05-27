@@ -3,9 +3,9 @@ package view;
 import exceptions.NoInstructionException;
 import exceptions.NoRegisterAddressException;
 import model.Register;
-import sun.security.acl.GroupImpl;
 import view.update.GUIListener;
-import view.update.UpdateGUIEvent;
+import view.update.UpdateGUIRegisterEvent;
+import view.update.UpdateGUIPortsIOEvent;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -65,26 +65,23 @@ public class JMainWindow implements ActionListener, GUIListener {
         scrollPane.setVisible(true);//Alles sichtbar machen
 
         //Scrollbar und Tabelle für Register
-
         model = new view.TableModel();
         tablereg = new JTable(model);
         tablereg.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table,
-                                                           Object value, boolean isSelected, boolean hasFocus,
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus,
                                                            int row, int column) {
 
                 Component c = super.getTableCellRendererComponent(table, value,
                         isSelected, hasFocus, row, column);
 
                     if (row < 32 && column==0) {
-
                         setBackground(Grau);
                         row++;
                     } else {
                         setBackground(Color.WHITE);
                     }
-
                 return this;
             }
         });
@@ -98,6 +95,9 @@ public class JMainWindow implements ActionListener, GUIListener {
         labelpc =new JLabel("PC:");
         labelSFR=new JLabel("SFR:");
         labelwreg=new JLabel("W:");
+        labelZ= new JLabel("Z:");
+        labelC=new JLabel("C:");
+        labelDC=new JLabel("DC:");
 
         platzhalter= new JTextField("",8);
         platzhalter.setVisible(false);
@@ -106,16 +106,30 @@ public class JMainWindow implements ActionListener, GUIListener {
 
         SFR.setEnabled(false);
 
-        pc = new JTextField("",4);
+        pc = new JTextField("",5);
         pc.setEditable(false);
         pc.setForeground(Color.BLACK);
         pc.setBackground(Grau);
-
 
         wreg=new JTextField("",4);
         wreg.setEditable(false);
         wreg.setForeground(Color.BLACK);
         wreg.setBackground(Grau);
+
+        zerobit = new JTextField("",5);
+        zerobit.setEditable(true);
+        zerobit.setForeground(Color.black);
+        zerobit.setBackground(Grau);
+
+        dc = new JTextField("",4);
+        dc.setEditable(false);
+        dc.setForeground(Color.black);
+        dc.setBackground(Grau);
+
+        carry = new JTextField("",4);
+        carry.setEditable(false);
+        carry.setForeground(Color.black);
+        carry.setBackground(Grau);
 
         //Panels dem Hauptfenster hinzufügen
         container.add(menueLeiste,BorderLayout.NORTH);
@@ -140,6 +154,12 @@ public class JMainWindow implements ActionListener, GUIListener {
         reg.add(labelwreg);
         reg.add(wreg);
         reg.add(platzhalter);
+        reg.add(labelZ);
+        reg.add(zerobit);
+        reg.add(labelC);
+        reg.add(carry);
+        reg.add(labelDC);
+        reg.add(dc);
         //reg.add(labelSFR);
         //reg.add(SFR);
 
@@ -152,6 +172,7 @@ public class JMainWindow implements ActionListener, GUIListener {
         ra.add(fiveA);
         ra.add(sixA);
         ra.add(sevenA);
+        PortA = new JCheckBox[]{zeroA, oneA, twoA, threeA, fourA};
 
         ra.add(zeroB);
         ra.add(oneB);
@@ -161,7 +182,7 @@ public class JMainWindow implements ActionListener, GUIListener {
         ra.add(fiveB);
         ra.add(sixB);
         ra.add(sevenB);
-
+        PortB = new JCheckBox[]{zeroB, oneB, twoB, threeB, fourB, fiveB, sixB, sevenB};
 
         //Hauptfenster mit Attributen ausstatten
         hauptFenster.setSize(1024, 640);
@@ -170,6 +191,9 @@ public class JMainWindow implements ActionListener, GUIListener {
         hauptFenster.setVisible(true);
         setwreg();
         setpcl();
+        setdc();
+        setZ();
+        setC();
         timer = new Timer(DELAY, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -294,6 +318,9 @@ public class JMainWindow implements ActionListener, GUIListener {
             setwreg();
             setpcl();
             setSFR();
+            setC();
+            setdc();
+            setZ();
         } catch (NoInstructionException e) {
             e.printStackTrace();
         } catch (NoRegisterAddressException e) {
@@ -339,93 +366,65 @@ public class JMainWindow implements ActionListener, GUIListener {
     }
 
     public void setpcl(){
-        pc.setText(String.valueOf(Integer.toHexString(menuBar.register.getPC()-1)));
+        pc.setText(String.valueOf(Integer.toHexString(menuBar.register.getPC())));
     }
     public void setSFR() throws NoRegisterAddressException {
         SFR.setText(String.valueOf(Integer.toHexString(menuBar.register.getRegValue(Register.FSR))));
     }
+    public void setC(){
+        carry.setText(String.valueOf(menuBar.register.testBit(menuBar.register.getRegStatus(), 0)));
+    }
+    public void setdc() {
+        dc.setText(String.valueOf(menuBar.register.testBit(menuBar.register.getRegStatus(), 1)));
+    }
+    public void setZ(){
+        zerobit.setText(String.valueOf(menuBar.register.testBit(menuBar.register.getRegStatus(), 2)));
+    }
 
     @Override
-    public void update(UpdateGUIEvent event) {
+    public void update(UpdateGUIPortsIOEvent event) {
         int address = event.getAddress();
         int value = event.getValue();
-        if (event.getCheckIO()) {
-            checkTris(address, value);
-        } else {
-            if(address == Register.PORTA) checkPortsA(value);
-            if(address == Register.PORTB) checkPortsB(value);
-            int row = (address/8);
-            int column = (address%8)+1;
-            String stringValue = Integer.toHexString(event.getValue());
-            model.setValueAt(stringValue, row, column);
-        }
-    }
-
-    private void checkTris(int address, int value) {
         if(address == (Register.TRISA | Register.PORTA)) {
             //TRIS A I/O change
-            if(menuBar.register.testBit(value, 0)) zeroA.setEnabled(true);
-            else zeroA.setEnabled(false);
-            if(menuBar.register.testBit(value, 1)) oneA.setEnabled(true);
-            else oneA.setEnabled(false);
-            if(menuBar.register.testBit(value, 2)) twoA.setEnabled(true);
-            else twoA.setEnabled(false);
-            if(menuBar.register.testBit(value, 3)) threeA.setEnabled(true);
-            else threeA.setEnabled(false);
-            if(menuBar.register.testBit(value, 4)) fourA.setEnabled(true);
-            else fourA.setEnabled(false);
+            for(int i=0; i<=4; i++) {
+                if(menuBar.register.testBit(value, i)) PortA[i].setEnabled(true);
+                else PortA[i].setEnabled(false);
+            }
         } else {
             //TRIS B I/O change
-            if(menuBar.register.testBit(value, 0)) zeroB.setEnabled(true);
-            else zeroB.setEnabled(false);
-            if(menuBar.register.testBit(value, 1)) oneB.setEnabled(true);
-            else oneB.setEnabled(false);
-            if(menuBar.register.testBit(value, 2)) twoB.setEnabled(true);
-            else twoB.setEnabled(false);
-            if(menuBar.register.testBit(value, 3)) threeB.setEnabled(true);
-            else threeB.setEnabled(false);
-            if(menuBar.register.testBit(value, 4)) fourB.setEnabled(true);
-            else fourB.setEnabled(false);
-            if(menuBar.register.testBit(value, 5)) fiveB.setEnabled(true);
-            else fiveB.setEnabled(false);
-            if(menuBar.register.testBit(value, 6)) sixB.setEnabled(true);
-            else sixB.setEnabled(false);
-            if(menuBar.register.testBit(value, 7)) sevenB.setEnabled(true);
-            else sevenB.setEnabled(false);
+            for(int i=0; i<=7; i++) {
+                if(menuBar.register.testBit(value, i)) PortB[i].setEnabled(true);
+                else PortB[i].setEnabled(false);
+            }
         }
     }
 
-    private void checkPortsA(int value) {
-        //PORT A change checkBox
-        if(menuBar.register.testBit(value, 0)) zeroA.setSelected(true);
-        else zeroA.setSelected(false);
-        if(menuBar.register.testBit(value, 1)) oneA.setSelected(true);
-        else oneA.setSelected(false);
-        if(menuBar.register.testBit(value, 2)) twoA.setSelected(true);
-        else twoA.setSelected(false);
-        if(menuBar.register.testBit(value, 3)) threeA.setSelected(true);
-        else threeA.setSelected(false);
-        if(menuBar.register.testBit(value, 4)) fourA.setSelected(true);
-        else fourA.setSelected(false);
-    }
+    @Override
+    public void update(UpdateGUIRegisterEvent event) {
+        int address = event.getAddress();
+        int value = event.getValue();
 
-    private void checkPortsB(int value) {
-        if(menuBar.register.testBit(value, 0)) zeroB.setSelected(true);
-        else zeroB.setSelected(false);
-        if(menuBar.register.testBit(value, 1)) oneB.setSelected(true);
-        else oneB.setSelected(false);
-        if(menuBar.register.testBit(value, 2)) twoB.setSelected(true);
-        else twoB.setSelected(false);
-        if(menuBar.register.testBit(value, 3)) threeB.setSelected(true);
-        else threeB.setSelected(false);
-        if(menuBar.register.testBit(value, 4)) fourB.setSelected(true);
-        else fourB.setSelected(false);
-        if(menuBar.register.testBit(value, 5)) fiveB.setSelected(true);
-        else fiveB.setSelected(false);
-        if(menuBar.register.testBit(value, 6)) sixB.setSelected(true);
-        else sixB.setSelected(false);
-        if(menuBar.register.testBit(value, 7)) sevenB.setSelected(true);
-        else sevenB.setSelected(false);
-    }
+        //Write Data to register table
+        int row = (address/8);
+        int column = (address%8)+1;
+        String stringValue = Integer.toHexString(event.getValue());
+        model.setValueAt(stringValue, row, column);
 
+        //Update Port Output
+        if (address == Register.PORTA) {
+            //Change checkBox of PortA
+            for(int i=0; i<=4; i++) {
+                if(menuBar.register.testBit(value, i)) PortA[i].setSelected(true);
+                else PortA[i].setSelected(false);
+            }
+        }
+        if (address == Register.PORTB) {
+            //Change checkBox of PortB
+            for(int i=0; i<=7; i++) {
+                if(menuBar.register.testBit(value, i)) PortB[i].setSelected(true);
+                else PortB[i].setSelected(false);
+            }
+        }
+    }
 }

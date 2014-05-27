@@ -1,8 +1,8 @@
 package view;
 
-import exceptions.NoRegisterAddressException;
 import model.Register;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,21 +50,7 @@ public class ButtonListener implements ActionListener {
         }
 
         if (object.getSource() == oeffnen) {
-            try {
-                menuBar.oeffnen();
-                FileReader fr = new FileReader(String.valueOf(menuBar.pathToSource));
-                BufferedReader br = new BufferedReader(fr);
-
-                String zeile = "";
-                while ((zeile = br.readLine()) != null)
-                {
-                    lstFile.read(br,null);
-                    zeile = br.readLine();
-                }
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            open();
         }
 
         if (object.getSource() == beenden) {
@@ -85,11 +71,8 @@ public class ButtonListener implements ActionListener {
         if (object.getSource() == doku) {
             System.out.println("doku wurde angeklickt");
             if (Desktop.isDesktopSupported()) {
-                try {
-                    Desktop.getDesktop().open(new File("./Dokumente/pic16f84A.pdf"));
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                try { Desktop.getDesktop().open(new File("./Dokumente/pic16f84A.pdf")); }
+                catch (IOException e1) { e1.printStackTrace(); }
             }
         }
         if (object.getSource() == about) {
@@ -97,82 +80,69 @@ public class ButtonListener implements ActionListener {
         }
 
         if (object.getSource() == zeroA) {
-            boolean selected;
-            if(zeroA.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTA, selected, 0);
+            portClick(zeroA, Register.PORTA, 0);
         }
         if (object.getSource() == oneA) {
-            boolean selected;
-            if(oneA.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTA, selected, 1);
+            portClick(oneA, Register.PORTA, 1);
         }
         if (object.getSource() == twoA) {
-            boolean selected;
-            if(twoA.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTA, selected, 2);
+            portClick(twoA, Register.PORTA, 2);
         }
         if (object.getSource() == threeA) {
-            boolean selected;
-            if(threeA.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTA, selected, 3);
+            portClick(threeA, Register.PORTA, 3);
         }
         if (object.getSource() == fourA) {
-            boolean selected;
-            if(fourA.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTA, selected, 4);
+            portClick(fourA, Register.PORTA, 4);
         }
         if (object.getSource() == zeroB) {
-            boolean selected;
-            if(zeroB.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTB, selected, 0);
+            portClick(zeroB, Register.PORTB, 0);
         }
         if (object.getSource() == oneB) {
-            boolean selected;
-            if(oneB.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTB, selected, 1);
+            portClick(oneB, Register.PORTB, 1);
         }
         if (object.getSource() == twoB) {
-            boolean selected;
-            if(twoB.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTB, selected, 2);
+            portClick(twoB, Register.PORTB, 2);
         }
         if (object.getSource() == threeB) {
-            boolean selected;
-            if(threeB.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTB, selected, 3);
+            portClick(threeB, Register.PORTB, 3);
         }
         if (object.getSource() == fourB) {
-            boolean selected;
-            if(fourB.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTB, selected, 4);
+            portClick(fourB, Register.PORTB, 4);
         }
         if (object.getSource() == fiveB) {
-            boolean selected;
-            if(fiveB.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTB, selected, 5);
+            portClick(fiveB, Register.PORTB, 5);
         }
         if (object.getSource() == sixB) {
-            boolean selected;
-            if(sixB.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTB, selected, 6);
+            portClick(sixB, Register.PORTB, 6);
         }
         if (object.getSource() == sevenB) {
-            boolean selected;
-            if(sevenB.isSelected()) selected=true;
-            else selected=false;
-            menuBar.register.setPort(Register.PORTB, selected, 7);
+            portClick(sevenB, Register.PORTB, 7);
         }
     }
+
+    private void open() {
+        try {
+            menuBar.oeffnen();
+            FileReader fr = new FileReader(String.valueOf(menuBar.pathToSource));
+            BufferedReader br = new BufferedReader(fr);
+
+            String zeile = "";
+            while ((zeile = br.readLine()) != null)
+            {
+                lstFile.read(br,null);
+                zeile = br.readLine();
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void portClick(JCheckBox PortButton, int addresse, int number) {
+        boolean selected;
+        if(PortButton.isSelected()) selected=true;
+        else selected=false;
+        menuBar.register.setPort(addresse, selected, number);
+    }
+
 }

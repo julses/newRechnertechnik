@@ -3,7 +3,8 @@ package model;
 
 import exceptions.NoRegisterAddressException;
 import view.update.GUIListener;
-import view.update.UpdateGUIEvent;
+import view.update.UpdateGUIRegisterEvent;
+import view.update.UpdateGUIPortsIOEvent;
 
 import javax.swing.event.EventListenerList;
 
@@ -43,9 +44,6 @@ public class Register {
     public static final int GPR_END = 0x2F;
     //***********************************
 
-    public static final int SFR = 0;
-    public static final int GPR = 1;
-
     private Stack stack;
     private int cycles;
     private int w; //W-Register
@@ -53,6 +51,7 @@ public class Register {
     private int latchPortA;
     private int latchPortB;
     private EventListenerList listeners;
+    private int regStatus;
 
     public Register(Stack stack) {
         this.stack = stack;
@@ -102,11 +101,11 @@ public class Register {
         if (address == PORTA) {
             reg[PORTA] = value;
             latchPortA = value;
-            notifyUpdateGUI(new UpdateGUIEvent(this, false, PORTA, value));
+            notifyUpdateGUI(new UpdateGUIRegisterEvent(this, PORTA, value));
         } else {
             reg[PORTB] = value;
             latchPortB = value;
-            notifyUpdateGUI(new UpdateGUIEvent(this, false, PORTB, value));
+            notifyUpdateGUI(new UpdateGUIRegisterEvent(this, PORTB, value));
         }
     }
 
@@ -120,6 +119,7 @@ public class Register {
                 if ((address & 0x7F) > GPR_END) {
                     return;
                 }
+
                 //Überprüung ob es sich um GPR (General Purpose Registers) Adresse handelt
                 if (((address & 0x7F) >= GPR_START) && (address & 0x7F) <= GPR_END) {
                     writeGPR(address, value);
@@ -134,7 +134,7 @@ public class Register {
         // Vorderes Bit durch Veroderung hinzufügen
         reg[address | 0x80] = value;
         //GUI updaten
-        notifyUpdateGUI(new UpdateGUIEvent(this, false, selectBank(address), value));
+        notifyUpdateGUI(new UpdateGUIRegisterEvent(this, selectBank(address), value));
     }
 
     private void writeSFR(int address, int value) {
@@ -182,13 +182,13 @@ public class Register {
                 reg[TRISA] = value;
                 reg[PORTA] = latchPortA & ~reg[TRISA];
                 //GUI updaten Input/Output setzen
-                notifyUpdateGUI(new UpdateGUIEvent(this, true, TRISA, value));
+                notifyUpdateGUI(new UpdateGUIPortsIOEvent(this, TRISA, value));
                 break;
             case TRISB:
                 reg[TRISB] = value;
                 reg[PORTB] = latchPortB & ~reg[TRISB];
                 //GUI updaten Input/Output setzen
-                notifyUpdateGUI(new UpdateGUIEvent(this, true, TRISB, value));
+                notifyUpdateGUI(new UpdateGUIPortsIOEvent(this, TRISB, value));
                 break;
             //PCLATH spiegeln
             case PCLATH:
@@ -207,19 +207,7 @@ public class Register {
                 reg[address] = value;
         }
         //GUI updaten
-        notifyUpdateGUI(new UpdateGUIEvent(this, false, selectBank(address), value));
-    }
-
-
-    public void addGUIListener( GUIListener listener )
-    {
-        listeners.add( GUIListener.class, listener );
-    }
-
-    protected synchronized void notifyUpdateGUI( UpdateGUIEvent event )
-    {
-        for ( GUIListener l : listeners.getListeners( GUIListener.class ) )
-            l.update(event);
+        notifyUpdateGUI(new UpdateGUIRegisterEvent(this, selectBank(address), value));
     }
 
     //Addresse an gewählte Bank anpassen
@@ -240,7 +228,7 @@ public class Register {
             //Indirekte Adressierung
             case INDF:
             case INDF + OFFSET:
-                return reg[FSR];
+                return reg[getRegValue(FSR)];
 
             //PORT A Eingänge lesen (TRIS A Reg = 1 --> eingang)
             case PORTA:
@@ -295,39 +283,47 @@ public class Register {
         return this.w & 0x00FF;
     }
 
-    public void checkDC(int value, int value2, boolean add) throws NoRegisterAddressException {
-        //If add=true -> Addition
-        if (add) {
-            if((value & 0x000F) + value2 > 0x000F){
-                    setRegValue(STATUS, 0x0002);
-            }
-        } else {
-            if((value & 0x000F) - value2 < 0){
-                setRegValue(STATUS, 0x0002);
-            }
-        }
+    public int getRegStatus() {
+        return reg[STATUS];
     }
 
     //Prüft ob ein Bit Carry vorliegt und setzt je nachdem das Carry Bit
     public void checkCarry(int f, int w, boolean add) throws NoRegisterAddressException {
         //If add=true -> Addition
-        int status = getRegValue(STATUS);
+        int status = getRegStatus();
         if (add) {
-            if(f + w > 0xFF){
-                setBit(status, 0);
-                setRegValue(STATUS, status);
+            if((f + w) > 0xFF){
+                status = setBit(status, 0);
+            } else {
+                status = clearBit(status, 0);
             }
         } else {
-            if(f - w < 0){
-                clearBit(status, 0);
-                setRegValue(STATUS, status);
+            if((f - w) < 0){
+                status = clearBit(status, 0);
+            } else {
+                status = setBit(status, 0);
             }
         }
+        setRegValue(STATUS, status);
     }
 
-    //Inkrementiert Cycles
-    public void incCycles() throws NoRegisterAddressException {
-        this.cycles++;
+    public void checkDC(int valueF, int valueW, boolean add) throws NoRegisterAddressException {
+        int status = getRegValue(STATUS);
+        //If add=true -> Addition
+        if (add) {
+            if(((valueF & 0x0F) + (valueW & 0x0F)) >= 0xF0){
+                status = setBit(status, 1);
+            } else {
+                status = clearBit(status, 1);
+            }
+        } else {
+            if(((valueF & 0x00F0) - (valueW & 0x00F0)) < 0x000F){
+                status = clearBit(status, 1);
+            } else {
+                status = setBit(status, 1);
+            }
+        }
+        setRegValue(STATUS, status);
     }
 
     //Testet bei einer Operation ob der Wert 0 ist und setzt je nachdem das Zero Bit
@@ -344,6 +340,11 @@ public class Register {
     //Gibt Zero Bit als booleschen Wert zurück
     public boolean getZeroBit() throws NoRegisterAddressException {
         return testBit(getRegValue(STATUS), 2);
+    }
+
+    //Inkrementiert Cycles
+    public void incCycles() throws NoRegisterAddressException {
+        this.cycles++;
     }
 
     //Setzt das Bit auf 1
@@ -364,6 +365,24 @@ public class Register {
     //Testet ein Bit und gibt booleschen Wert zurück
     public boolean testBit(int instruction, int pos) {
         return (instruction & 1<<pos) != 0;
+    }
+
+    //Ab hier werden die Eventhandler definiert
+    public void addGUIListener( GUIListener listener )
+    {
+        listeners.add( GUIListener.class, listener );
+    }
+
+    protected synchronized void notifyUpdateGUI( UpdateGUIRegisterEvent event )
+    {
+        for ( GUIListener l : listeners.getListeners( GUIListener.class ) )
+            l.update(event);
+    }
+
+    protected synchronized void notifyUpdateGUI( UpdateGUIPortsIOEvent event )
+    {
+        for ( GUIListener l : listeners.getListeners( GUIListener.class ) )
+            l.update(event);
     }
 
 }

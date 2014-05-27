@@ -386,13 +386,14 @@ public class Operations {
             int diff = w - f;
             value = 256 - diff;
             //CarryBit = 0 da negatives Ergebnis
-            register.clearBit(status, 0);
+            register.setRegValue(Register.STATUS, register.clearBit(status, 0));
+            register.setRegValue(Register.STATUS, register.clearBit(status, 1));
         } else {
             value = f - w;
             // CarryBit = 1 da Ergebnis 0 oder positiv
-            register.setBit(status, 0);
+            register.setRegValue(Register.STATUS, register.setBit(status, 0));
+            register.setRegValue(Register.STATUS, register.setBit(status, 1));
         }
-        register.setRegValue(Register.STATUS, status);
         //falls value pos vorzeichen entfernen
         value = value & 0x1FF;
         if(instruction < 0x007F) {
@@ -401,7 +402,6 @@ public class Operations {
             register.setRegValue(address, value);
         }
         register.checkZeroBit(value);
-        register.checkDC(f, w, false);
         register.incPC();
         register.incCycles();
     }
@@ -539,9 +539,15 @@ public class Operations {
     public void addlw(int instruction) throws NoRegisterAddressException {
         System.out.println("addlw with: 0x" + Integer.toHexString(instruction));
         //Maskieren
-        int value = instruction & 0x00FF;
+        int k = instruction & 0x00FF;
+        int w = register.getW();
+        int value = w+k;
+        //ZeroBit, CarryBit, DigitalCarryBit
+        register.checkZeroBit(value);
+        register.checkCarry(w, k, true);
+        register.checkDC(w, k, true);
         //Werte addieren
-        register.setW(register.getW() + value);
+        register.setW(value);
         register.incPC();
         register.incCycles();
     }
@@ -576,6 +582,7 @@ public class Operations {
         int k = instruction & 0x07FF;
         //(PC+1) is pushed onto the stack
         stack.push((register.getPC()+1));
+        System.out.println("Auf Stack gepushed: " + Integer.toHexString(register.getPC()+1));
 
         //0b---4 3xxx
         int pcLath = register.getRegValue(Register.PCLATH);
@@ -586,6 +593,7 @@ public class Operations {
 
         //pc setzen
         register.setPC(pcLath+k);
+        System.out.println("ProgrammCounter: " + Integer.toHexString(pcLath + k));
         //2 Cycles
         register.incCycles();
         register.incCycles();
@@ -662,8 +670,10 @@ public class Operations {
         // write to register w
         register.setW(k);
 
-        //TOS --> PC
-        register.setPC(stack.pop());
+        //TOS in PC laden
+        int pc = stack.pop();
+        register.setPC(pc);
+        System.out.println("PC von Stack gepoped: " + Integer.toHexString(pc));
 
         // 2 Cycles
         register.incCycles();

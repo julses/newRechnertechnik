@@ -24,7 +24,7 @@ public class Objects {
     public static JButton stepButton;
     public static JButton startStopButton;
     public static JButton resetButton;
-
+    //PortA
     public static JCheckBox zeroA;
     public static JCheckBox oneA;
     public static JCheckBox twoA;
@@ -33,7 +33,8 @@ public class Objects {
     public static JCheckBox fiveA;
     public static JCheckBox sixA;
     public static JCheckBox sevenA;
-
+    public static JCheckBox[] PortA;
+    //PortB
     public static JCheckBox zeroB;
     public static JCheckBox oneB;
     public static JCheckBox twoB;
@@ -42,37 +43,44 @@ public class Objects {
     public static JCheckBox fiveB;
     public static JCheckBox sixB;
     public static JCheckBox sevenB;
-
-
+    public static JCheckBox[] PortB;
 
     // Menüleiste
     public static JMenuBar menueLeiste;
-    // Menüleiste Elemente
-    public static JMenu datei;
-    public static JMenu optionen;
-    public static JMenu hilfe;
-    // Datei
-    public static JMenuItem oeffnen;
-    public static JMenuItem beenden;
-    // Optionen
-    public static JMenuItem step;
-    public static JMenuItem reset;
-    public static JMenuItem einstellungen;
-    // Hilfe
-    public static JMenuItem doku;
-    public static JMenuItem about;
-    // Textfeld
-    public static JTextArea lstFile;
+        // Menüleiste Elemente
+        public static JMenu datei;
+        public static JMenu optionen;
+        public static JMenu hilfe;
+        // Datei
+        public static JMenuItem oeffnen;
+        public static JMenuItem beenden;
+        // Optionen
+        public static JMenuItem step;
+        public static JMenuItem reset;
+        public static JMenuItem einstellungen;
+        // Hilfe
+        public static JMenuItem doku;
+        public static JMenuItem about;
 
+    // Textfelder
+    public static JTextArea lstFile; //Programmcode
     public static JTextField pc;
     public static JTextField SFR;
     public static JTextField wreg;
     public static JTextField platzhalter;
+    public static JTextField zerobit;
+    public static JTextField dc;
+    public static JTextField carry;
 
+    //Beschriftungslabel
     public static JLabel labelpc;
     public static JLabel labelSFR;
     public static JLabel labelwreg;
+    public static JLabel labelDC;
+    public static JLabel labelZ;
+    public static JLabel labelC;
 
+    //Registertabelle
     public static AbstractTableModel model;
     public static JTable tablereg;
 }

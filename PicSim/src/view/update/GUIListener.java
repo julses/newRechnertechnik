@@ -10,5 +10,6 @@ import java.util.EventListener;
  * To change this template use File | Settings | File Templates.
  */
 public interface GUIListener extends EventListener{
-    void update ( UpdateGUIEvent event);
+    void update ( UpdateGUIRegisterEvent event);
+    void update ( UpdateGUIPortsIOEvent event);
 }
