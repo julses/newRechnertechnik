@@ -8,11 +8,11 @@ import java.util.EventObject;
  * Time: 12:27
  * To change this template use File | Settings | File Templates.
  */
-public class UpdateGUIRegisterEvent extends EventObject{
+public class UpdateGUIRegister extends EventObject{
     private final int address;
     private final int value;
 
-    public UpdateGUIRegisterEvent(Object source, int address, int value)
+    public UpdateGUIRegister(Object source, int address, int value)
     {
         super( source );
         this.address = address;

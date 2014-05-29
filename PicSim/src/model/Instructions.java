@@ -9,12 +9,12 @@ import exceptions.NoRegisterAddressException;
  * Time: 19:22
  * To change this template use File | Settings | File Templates.
  */
-public class Operations {
+public class Instructions {
 
     private Stack stack;
     private Register register;
 
-    public Operations(Register register, Stack stack) {
+    public Instructions(Register register, Stack stack) {
         this.register = register;
         this.stack = stack;
     }
@@ -32,6 +32,7 @@ public class Operations {
         int f = register.getRegValue(address);
         int w = register.getW();
         int value = f + w;
+        System.out.println("ADDWF, value: " + Integer.toHexString(value));
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
@@ -402,6 +403,8 @@ public class Operations {
             register.setRegValue(address, value);
         }
         register.checkZeroBit(value);
+        register.checkCarry(f, w, false);
+        register.checkDC(f, w, false);
         register.incPC();
         register.incCycles();
     }
@@ -564,6 +567,7 @@ public class Operations {
         int value = instruction & 0x00FF;
         //Werte ver'UND'en
         register.setW(register.getW() & value);
+        register.checkZeroBit(value);
         register.incPC();
         register.incCycles();
     }
@@ -694,25 +698,27 @@ public class Operations {
         // process data
         if (w > k) {
             // CarryBit = 0, da negatives Ergebnis
-            register.clearBit(Register.STATUS, 0);
             //Überlauf
             int diff = w - k;
-
             value = 256 - diff;
         } else {
             //CarryBit = 1 da Ergebnis positiv oder 0
-            register.setBit(Register.STATUS, 0);
             value = k - w;
         }
+
         //Check DC
+        int status = register.getRegValue(Register.STATUS);
         if ((w & 0x0F) > (k & 0x0F)) {
             //DC = 0 da negatives Ergebnis
-            register.clearBit(Register.STATUS, 1);
+            register.clearBit(status, 1);
         } else {
             // DC = 1 da Ergebnis 0 oder positiv
-            register.setBit(Register.STATUS, 1);
+            register.setBit(status, 1);
         }
+        register.setRegValue(Register.STATUS, status);
+
         //Check CarryBit
+        register.checkCarry(k, w, true);
         register.checkZeroBit(value);
         //write to destinaton
         register.setW(value);

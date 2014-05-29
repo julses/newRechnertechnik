@@ -9,11 +9,11 @@ import java.util.EventObject;
  * Time: 10:36
  * To change this template use File | Settings | File Templates.
  */
-public class UpdateGUIPortsIOEvent extends EventObject {
+public class UpdateGUIPortsIO extends EventObject {
     private final int address;
     private final int value;
 
-    public UpdateGUIPortsIOEvent( Object source, int address, int value )
+    public UpdateGUIPortsIO(Object source, int address, int value)
     {
         super( source );
         this.address = address;

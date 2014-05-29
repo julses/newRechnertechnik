@@ -5,8 +5,8 @@ import exceptions.NoRegisterAddressException;
 import model.Register;
 import view.update.GUIListener;
 import view.update.UpdateGUIInfoField;
-import view.update.UpdateGUIRegisterEvent;
-import view.update.UpdateGUIPortsIOEvent;
+import view.update.UpdateGUIPortsIO;
+import view.update.UpdateGUIRegister;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -353,7 +353,7 @@ public class JMainWindow implements ActionListener, GUIListener {
     }
 
     @Override
-    public void update(UpdateGUIPortsIOEvent event) {
+    public void update(UpdateGUIPortsIO event) {
         int address = event.getAddress();
         int value = event.getValue();
         if(address == (Register.TRISA | Register.PORTA)) {
@@ -372,7 +372,7 @@ public class JMainWindow implements ActionListener, GUIListener {
     }
 
     @Override
-    public void update(UpdateGUIRegisterEvent event) {
+    public void update(UpdateGUIRegister event) {
         int address = event.getAddress();
         int value = event.getValue();
 
@@ -409,14 +409,10 @@ public class JMainWindow implements ActionListener, GUIListener {
             case Register.W:
                 wreg.setText(String.valueOf(Integer.toHexString(value)));
                 break;
-            case Register.Z:
-                zerobit.setText(String.valueOf(value));
-                break;
-            case Register.C:
-                carry.setText(String.valueOf(value));
-                break;
-            case Register.DC:
-                dc.setText(String.valueOf(value));
+            case Register.STATUS:
+                carry.setText(String.valueOf(menuBar.register.testBit(value, 0)));
+                dc.setText(String.valueOf(menuBar.register.testBit(value, 1)));
+                zerobit.setText(String.valueOf(menuBar.register.testBit(value, 2)));
                 break;
         }
     }

@@ -17,10 +17,10 @@ public class PicSim {
     public static void main(String[] args) throws IOException {
         Stack stack = new Stack();
         Register register = new Register(stack);
-        Operations operations = new Operations(register, stack);
+        Instructions instructions = new Instructions(register, stack);
         Interrupts interrupts = new Interrupts(register);
         Scan scanner = new Scan(register);
-        Pars parser = new Pars(operations);
+        Pars parser = new Pars(instructions);
         MenuBar menubar = new MenuBar(parser, scanner, register);
         register.addGUIListener(new JMainWindow (menubar));
     }

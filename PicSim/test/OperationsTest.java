@@ -1,4 +1,4 @@
-import model.Operations;
+import model.Instructions;
 import model.Pars;
 import model.Register;
 import model.Stack;
@@ -17,7 +17,7 @@ import org.junit.Test;
 public class OperationsTest {
     Stack stack = new Stack();
     Register register = new Register(stack);
-    Operations oper = new Operations(register, stack);
+    Instructions oper = new Instructions(register, stack);
     Pars pars = new Pars(oper);
 
 

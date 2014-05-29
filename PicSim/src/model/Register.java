@@ -4,8 +4,8 @@ package model;
 import exceptions.NoRegisterAddressException;
 import view.update.GUIListener;
 import view.update.UpdateGUIInfoField;
-import view.update.UpdateGUIRegisterEvent;
-import view.update.UpdateGUIPortsIOEvent;
+import view.update.UpdateGUIPortsIO;
+import view.update.UpdateGUIRegister;
 
 import javax.swing.event.EventListenerList;
 
@@ -49,7 +49,6 @@ public class Register {
     public static final int Z = 10;
     public static final int C = 11;
     public static final int DC = 12;
-
 
     private Stack stack;
     private int cycles;
@@ -99,20 +98,24 @@ public class Register {
         }
     }
 
+    //Methode für das direkte setzen von Ports durch User Input
     public void setPort(int address, boolean selected, int bit) {
         int value;
+        //Maskierung für PortA
         if (address == PORTA) value = (reg[address] & 0x1F);
         else value = reg[address];
+        //Setzt oder cleared das geünschte bit
         if(selected) value = setBit(value, bit);
         else value = clearBit(value, bit);
+        //Schreibt den Wert ins Register
         if (address == PORTA) {
             reg[PORTA] = value;
             latchPortA = value;
-            notifyUpdateGUI(new UpdateGUIRegisterEvent(this, PORTA, value));
+            notifyUpdateGUI(new UpdateGUIRegister(this, PORTA, value));
         } else {
             reg[PORTB] = value;
             latchPortB = value;
-            notifyUpdateGUI(new UpdateGUIRegisterEvent(this, PORTB, value));
+            notifyUpdateGUI(new UpdateGUIRegister(this, PORTB, value));
         }
     }
 
@@ -121,13 +124,11 @@ public class Register {
                 if (address > REG_MAX) {
                     throw new NoRegisterAddressException(address);
                 }
-
                 //Unseporteten Adressbereich nicht beschreiben
                 if ((address & 0x7F) > GPR_END) {
                     return;
                 }
-
-                //Überprüung ob es sich um GPR (General Purpose Registers) Adresse handelt
+                //Überprüung ob es sich um GPR (General Purpose Registers) oder SFR (Special Function Register) Adresse handelt
                 if (((address & 0x7F) >= GPR_START) && (address & 0x7F) <= GPR_END) {
                     writeGPR(address, value);
                 } else {
@@ -135,15 +136,17 @@ public class Register {
                 }
     }
 
+    //Schreibt ins General Purpose Register Bereich
     private void writeGPR(int address, int value) {
         // Vorderes Bit durch Maskierung löschen
         reg[address & 0x7F] = value;
         // Vorderes Bit durch Veroderung hinzufügen
         reg[address | 0x80] = value;
         //GUI updaten
-        notifyUpdateGUI(new UpdateGUIRegisterEvent(this, selectBank(address), value));
+        notifyUpdateGUI(new UpdateGUIRegister(this, selectBank(address), value));
     }
 
+    //Schreibt ins Special Function Register Bereich
     private void writeSFR(int address, int value) {
         // Bank auswählen
         address = selectBank(address);
@@ -160,6 +163,7 @@ public class Register {
             case PCL + OFFSET:
                 reg[PCL] = value;
                 reg[PCL + OFFSET] = value;
+                notifyUpdateGUI(new UpdateGUIInfoField(this, PC, value));
                 break;
             //STATUS spiegeln
             case STATUS:
@@ -167,6 +171,7 @@ public class Register {
                 //value = value & 0xE7; //0b1110 0111 --> TO & PD nur lesbar
                 reg[STATUS] = value;
                 reg[STATUS + OFFSET] = value;
+                notifyUpdateGUI(new UpdateGUIInfoField(this, STATUS, value));
                 break;
             //FSR spiegeln
             case FSR:
@@ -189,13 +194,13 @@ public class Register {
                 reg[TRISA] = value;
                 reg[PORTA] = latchPortA & ~reg[TRISA];
                 //GUI updaten Input/Output setzen
-                notifyUpdateGUI(new UpdateGUIPortsIOEvent(this, TRISA, value));
+                notifyUpdateGUI(new UpdateGUIPortsIO(this, TRISA, value));
                 break;
             case TRISB:
                 reg[TRISB] = value;
                 reg[PORTB] = latchPortB & ~reg[TRISB];
                 //GUI updaten Input/Output setzen
-                notifyUpdateGUI(new UpdateGUIPortsIOEvent(this, TRISB, value));
+                notifyUpdateGUI(new UpdateGUIPortsIO(this, TRISB, value));
                 break;
             //PCLATH spiegeln
             case PCLATH:
@@ -214,7 +219,7 @@ public class Register {
                 reg[address] = value;
         }
         //GUI updaten
-        notifyUpdateGUI(new UpdateGUIRegisterEvent(this, selectBank(address), value));
+        notifyUpdateGUI(new UpdateGUIRegister(this, selectBank(address), value));
     }
 
     //Addresse an gewählte Bank anpassen
@@ -271,7 +276,6 @@ public class Register {
         setRegValue(PCLATH, (pc & 0x1F00) >> 8); //0b0001 1111 0000 0000 >> 0b0000 0000 0001 1111
         //Unteren 8 bit im PCL speichern
         setRegValue(PCL, pc & 0x00FF);    //0b0000 0000 1111 1111
-        notifyUpdateGUI(new UpdateGUIInfoField(this, PC, (pc&0x00FF)));
     }
 
     //Inkrementiert den PC
@@ -316,37 +320,30 @@ public class Register {
             }
         }
         setRegValue(STATUS, status);
-        int test;
-        if (testBit(status, 0)) test=1;
-        else test=0;
-        notifyUpdateGUI(new UpdateGUIInfoField(this, C, test));
     }
 
     public void checkDC(int valueF, int valueW, boolean add) throws NoRegisterAddressException {
         int status = getRegValue(STATUS);
         //If add=true -> Addition
         if (add) {
-            if(((valueF & 0x0F) + (valueW & 0x0F)) >= 0xF0){
+            if(((valueF & 0x0F) + (valueW & 0x0F)) >= 0x10){
                 status = setBit(status, 1);
             } else {
                 status = clearBit(status, 1);
             }
         } else {
-            if(((valueF & 0x00F0) - (valueW & 0x00F0)) < 0x000F){
-                status = clearBit(status, 1);
-            } else {
+            if(((valueF & 0xF0) - (valueW & 0x00F0)) < 0x000F){
                 status = setBit(status, 1);
+            } else {
+                status = clearBit(status, 1);
             }
         }
         setRegValue(STATUS, status);
-        int test;
-        if (testBit(status, 0)) test=1;
-        else test=0;
-        notifyUpdateGUI(new UpdateGUIInfoField(this, DC, test));
     }
 
     //Testet bei einer Operation ob der Wert 0 ist und setzt je nachdem das Zero Bit
     public void checkZeroBit(int value) throws NoRegisterAddressException {
+        value = (value & 0xFF);
         int status = getRegValue(STATUS);
         if (value == 0){
             status = setBit(status, 2);
@@ -354,10 +351,6 @@ public class Register {
             status = clearBit(status, 2);
         }
         setRegValue(STATUS, status);
-        int test;
-        if (testBit(status, 0)) test=1;
-        else test=0;
-        notifyUpdateGUI(new UpdateGUIInfoField(this, Z, test));
     }
 
     //Gibt Zero Bit als booleschen Wert zurück
@@ -396,13 +389,13 @@ public class Register {
         listeners.add( GUIListener.class, listener );
     }
 
-    protected synchronized void notifyUpdateGUI( UpdateGUIRegisterEvent event )
+    protected synchronized void notifyUpdateGUI( UpdateGUIRegister event )
     {
         for ( GUIListener l : listeners.getListeners( GUIListener.class ) )
             l.update(event);
     }
 
-    protected synchronized void notifyUpdateGUI( UpdateGUIPortsIOEvent event )
+    protected synchronized void notifyUpdateGUI( UpdateGUIPortsIO event )
     {
         for ( GUIListener l : listeners.getListeners( GUIListener.class ) )
             l.update(event);
