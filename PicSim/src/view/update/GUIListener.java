@@ -13,4 +13,5 @@ public interface GUIListener extends EventListener{
     void update ( UpdateGUIRegister event);
     void update ( UpdateGUIPortsIO event);
     void update ( UpdateGUIInfoField event);
+    void update ( UpdateGUIStack event );
 }

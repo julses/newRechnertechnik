@@ -3,6 +3,7 @@ package model;
 import view.JMainWindow;
 import view.MenuBar;
 
+import javax.swing.event.EventListenerList;
 import java.io.IOException;
 
 /**
@@ -15,14 +16,15 @@ import java.io.IOException;
 public class PicSim {
 
     public static void main(String[] args) throws IOException {
-        Stack stack = new Stack();
-        Register register = new Register(stack);
+        EventListenerList guiListener = new EventListenerList();
+        Stack stack = new Stack(guiListener);
+        Register register = new Register(stack, guiListener);
         Instructions instructions = new Instructions(register, stack);
         Interrupts interrupts = new Interrupts(register);
         Scan scanner = new Scan(register);
         Pars parser = new Pars(instructions);
         MenuBar menubar = new MenuBar(parser, scanner, register);
-        register.addGUIListener(new JMainWindow (menubar));
+        register.addGUIListener(new JMainWindow(menubar));
     }
 
 }

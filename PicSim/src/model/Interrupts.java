@@ -1,5 +1,9 @@
 package model;
 
+import exceptions.NoRegisterAddressException;
+
+import static model.Register.Adresses.*;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Jan
@@ -9,6 +13,8 @@ package model;
  */
 public class Interrupts {
 
+    private int prevPortA;
+    private int prevPortB;
     private Register register;
 
     public Interrupts(Register register) {
@@ -16,4 +22,82 @@ public class Interrupts {
     }
 
     //Taster und TMR0
+    public void next() throws NoRegisterAddressException {
+        int portA = register.getRegValue(PORTA);
+        int portB = register.getRegValue(PORTB);
+        int prevPortA = this.prevPortA;
+        int prevPortB = this.prevPortB;
+
+        //RA4
+        if (prevPortA != -1) {
+            int RA4 = (register.testBit(portA, 4)) ? 1 : 0;
+            int prevRA4 = (register.testBit(prevPortA, 4)) ? 1 : 0;
+
+            if (RA4 != prevRA4) {
+                PortRA4Interrupt();
+            }
+        }
+        //RB0
+        if (prevPortB != -1) {
+            INTInterrupt();
+            PortRBInterrupt();
+        }
+        //checkINTInterrupt();
+        //checkPortRBInterrupt();
+        //checkTMR0Interrupt();
+        this.prevPortA = portA;
+        this.prevPortB = portB;
+
+    }
+
+    private void PortRA4Interrupt() throws NoRegisterAddressException {
+        //T0CS = 1 -> RA4 T0CKI aktive
+        if (register.testBit(register.getRegValue(OPTION_REG), 5)) {
+            //edge prüfen
+            if (register.testBit(register.getRegValue(OPTION_REG), 4) != register.testBit(register.getRegValue(PORTA), 4)) {
+                if (!register.testBit(register.getRegValue(OPTION_REG), 3)) {
+                    //TMR0 PreScaler
+                    //ioUnit.incPreScaler();
+                } else {
+                    //wdt prescaler
+                    //TMR0++
+                    int value = (register.getRegValue(TMR0) + 1) & 0x0FF;
+                    register.setRegValue(TMR0, value);
+
+                    //TMR0 Overflow?
+                    if (register.getRegValue(TMR0) == 0x00) {
+                        //iT0IF = 1
+                        register.setRegValue(INTCON, register.setBit(register.getRegValue(INTCON), 2));
+                    }
+                }
+            }
+        }
+    }
+
+    private void INTInterrupt() throws NoRegisterAddressException {
+        if (register.testBit(this.prevPortB, 0) != register.testBit(register.getRegValue(PORTB), 0)) {
+            //steigende/ fallende edge prüfen (if INTEDG == RB0)
+            if (register.testBit(register.getRegValue(OPTION_REG), 6) == register.testBit(register.getRegValue(PORTB), 0)) {
+                //INTF = 1
+                register.setRegValue(INTCON, register.setBit(register.getRegValue(INTCON), 1));
+            }
+        }
+    }
+
+    /**
+     * Port RB Interrupt
+     */
+    private void PortRBInterrupt() throws NoRegisterAddressException {
+        if (register.testBit(register.getRegValue(INTCON), 3)) {
+            //Port B Pin 4-7
+            for (int i = 4; i <= 7; i++) {
+                if (register.testBit(this.prevPortB, i) != register.testBit(register.getRegValue(PORTB), i)) {
+                    // RBIF = 1
+                    register.setRegValue(INTCON, register.setBit(register.getRegValue(INTCON), 0));
+                    break;
+                }
+            }
+        }
+    }
+
 }

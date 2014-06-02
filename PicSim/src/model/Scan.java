@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import exceptions.NoInstructionFoundException;
 import model.Converter;
 
 /**
@@ -49,9 +50,7 @@ public class Scan {
 
         String zeile = "";
         while ((zeile = br.readLine()) != null) {
-
             zeile = zeile.substring(5, 9);              //Befehlscode aus LST lesen
-
             if (!(zeile.equals("    ") || !isHexValue(zeile))) {                 //Abfrage ob Leerzeile in LST
                 /* String val = "0x";
                  * val += zeile;
@@ -66,7 +65,6 @@ public class Scan {
         }
         dotxt(hexCode, "HexCodeBefehle");
         //dotxt(binaryCode, "BinärCodeBefehle");
-        Iterator<String> iterator = hexCode.iterator();
         br.close();
     }
 
@@ -97,25 +95,17 @@ public class Scan {
                 try {
                     fw.close();
                 } catch (IOException e) {
+                    e.printStackTrace();
             }
         }
 
     }
 
-    /*Oldie but goldie ;)
-    public String getOperation(){
-        //Test welche Binärzahlen in Liste stehen
-        if(iterator.hasNext()){
-            return iterator.next();
-        }else{
-            System.out.println("Kein Befehl mehr vorhanden!");
-            return null;
-        }
-    }*/
-
     //Gibt den Befehl an der der PC steht zurück
-    public String getOper() {
-        return hexCode.get(register.getPC());
+    public String getOper() throws NoInstructionFoundException {
+        int pc = register.getPC();
+        if (pc > (hexCode.size()-1)) throw new NoInstructionFoundException(pc);
+        else return hexCode.get(register.getPC());
     }
 
     //Setzt den PIC zurück

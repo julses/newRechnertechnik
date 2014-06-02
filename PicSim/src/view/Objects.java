@@ -47,23 +47,24 @@ public class Objects {
 
     // Menüleiste
     public static JMenuBar menueLeiste;
-        // Menüleiste Elemente
-        public static JMenu datei;
-        public static JMenu optionen;
-        public static JMenu hilfe;
-        // Datei
-        public static JMenuItem oeffnen;
-        public static JMenuItem beenden;
-        // Optionen
-        public static JMenuItem step;
-        public static JMenuItem reset;
-        public static JMenuItem einstellungen;
-        // Hilfe
-        public static JMenuItem doku;
-        public static JMenuItem about;
+    // Menüleiste Elemente
+    public static JMenu datei;
+    public static JMenu optionen;
+    public static JMenu hilfe;
+    // Datei
+    public static JMenuItem oeffnen;
+    public static JMenuItem beenden;
+    // Optionen
+    public static JMenuItem step;
+    public static JMenuItem reset;
+    public static JMenuItem einstellungen;
+    // Hilfe
+    public static JMenuItem doku;
+    public static JMenuItem about;
+    // Textfeld
+    public static JTextArea lstFile;
+    public static JTextArea stack;
 
-    // Textfelder
-    public static JTextArea lstFile; //Programmcode
     public static JTextField pc;
     public static JTextField SFR;
     public static JTextField wreg;
@@ -83,4 +84,5 @@ public class Objects {
     //Registertabelle
     public static AbstractTableModel model;
     public static JTable tablereg;
+    public static JTable tablelst;
 }

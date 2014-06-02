@@ -1,6 +1,7 @@
 package model;
 
 import exceptions.NoRegisterAddressException;
+import static model.Register.Adresses.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -323,11 +324,11 @@ public class Instructions {
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
         // Carrybit auslesen
-        int c = (register.getRegValue(Register.STATUS)) & 0x01;
+        int c = ((register.getRegValue(STATUS)) & 0x01);
         // neues Carrybit setzen
-        register.setRegValue(Register.STATUS, (f >>> 7) & 0x0001);
+        register.setRegValue(STATUS, (f >>> 7) & 0x0001);
         // nach links shiften und c anhängen
-        int value = (f << 1) | c;
+        int value = (f << 1) + c;
         if(instruction < 0x007F) {
             register.setW(value);
         } else {
@@ -351,11 +352,11 @@ public class Instructions {
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
         // aktuelles Carrybit speichern
-        int c = (register.getRegValue(Register.STATUS)) & 0x01;
+        int c = (register.getRegValue(STATUS)) & 0x01;
         // neues Carrybit setzen
-        register.setRegValue(Register.STATUS, (f >>> 0) & 0x0001);
-        // nach links shiften und c um 7 stellen nach rechts geshiftet anhängen
-        int value = (f >> 1) | (c << 7);
+        register.setRegValue(STATUS, (f >>> 0) & 0x0001);
+        // nach rechts shiften und c um 7 stellen nach links geshiftet addieren
+        int value = (f >> 1) + (c << 7);
         //setRegValue to destination
         if(instruction < 0x007F) {
             register.setW(value);
@@ -379,7 +380,7 @@ public class Instructions {
         int address = instruction & 0x007F;
         int f = register.getRegValue(address);
         int w = register.getW();
-        int status = register.getRegValue(Register.STATUS);
+        int status = register.getRegValue(STATUS);
         //process data
         int value;
         if (w > f) {
@@ -387,13 +388,11 @@ public class Instructions {
             int diff = w - f;
             value = 256 - diff;
             //CarryBit = 0 da negatives Ergebnis
-            register.setRegValue(Register.STATUS, register.clearBit(status, 0));
-            register.setRegValue(Register.STATUS, register.clearBit(status, 1));
+            //register.setRegValue(Register.STATUS, register.clearBit(status, 1));
         } else {
             value = f - w;
             // CarryBit = 1 da Ergebnis 0 oder positiv
-            register.setRegValue(Register.STATUS, register.setBit(status, 0));
-            register.setRegValue(Register.STATUS, register.setBit(status, 1));
+            //register.setRegValue(Register.STATUS, register.setBit(status, 1));
         }
         //falls value pos vorzeichen entfernen
         value = value & 0x1FF;
@@ -589,7 +588,7 @@ public class Instructions {
         System.out.println("Auf Stack gepushed: " + Integer.toHexString(register.getPC()+1));
 
         //0b---4 3xxx
-        int pcLath = register.getRegValue(Register.PCLATH);
+        int pcLath = register.getRegValue(PCLATH);
         //pcLath<4:3>
         pcLath = (pcLath >> 3) & 0x03;
         //0tes und 1tes bit wird an 11te und 12te Stelle gerückt
@@ -616,7 +615,7 @@ public class Instructions {
         int k = instruction & 0x00FF;
 
         //0b---4 3xxx
-        int pcLath = register.getRegValue(Register.PCLATH);
+        int pcLath = register.getRegValue(PCLATH);
         //pcLath<4:3>
         pcLath = (pcLath >> 3) & 0x03;
         // 0tes und 1tes bit wird an 11te und 12te Stelle gerückt
@@ -707,7 +706,7 @@ public class Instructions {
         }
 
         //Check DC
-        int status = register.getRegValue(Register.STATUS);
+        int status = register.getRegValue(STATUS);
         if ((w & 0x0F) > (k & 0x0F)) {
             //DC = 0 da negatives Ergebnis
             register.clearBit(status, 1);
@@ -715,10 +714,10 @@ public class Instructions {
             // DC = 1 da Ergebnis 0 oder positiv
             register.setBit(status, 1);
         }
-        register.setRegValue(Register.STATUS, status);
+        register.setRegValue(STATUS, status);
 
         //Check CarryBit
-        register.checkCarry(k, w, true);
+        register.checkCarry(k, w, false);
         register.checkZeroBit(value);
         //write to destinaton
         register.setW(value);

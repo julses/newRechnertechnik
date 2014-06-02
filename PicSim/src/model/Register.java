@@ -1,6 +1,6 @@
 package model;
 
-
+import static model.Register.Adresses.*;
 import exceptions.NoRegisterAddressException;
 import view.update.GUIListener;
 import view.update.UpdateGUIInfoField;
@@ -17,38 +17,38 @@ import javax.swing.event.EventListenerList;
  * To change this template use File | Settings | File Templates.
  */
 public class Register {
+    public class Adresses {
+        //***********************************
+        //Register Adressen
+        public static final int REG_MAX = 0xFF;
+        //Bank 0 Adressen
+        public static final int INDF = 0x00;
+        public static final int TMR0 = 0x01;
+        public static final int PCL = 0x02;
+        public static final int STATUS = 0x03;
+        public static final int FSR = 0x04;
+        public static final int PORTA = 0x05;
+        public static final int PORTB = 0x06;
+        public static final int UNIMPLEMENTED = 0x07;
+        public static final int EEDATA = 0x08;
+        public static final int EEADR = 0x09;
+        public static final int PCLATH = 0x0A;
+        public static final int INTCON = 0x0B;
+        //Bank 1 Adressen
+        public static final int OFFSET = 0x80;
+        public static final int OPTION_REG = 0x81;
+        public static final int TRISA = 0x85;
+        public static final int TRISB = 0x86;
+        public static final int EECON1 = 0x88;
+        //GPR Adressen
+        public static final int GPR_START = 0x0C;
+        public static final int GPR_END = 0x2F;
+        //***********************************
+        public static final int PC = -1;
+        public static final int W = -2;
+    }
 
-    //***********************************
-    //Register Adressen
-    public static final int REG_MAX = 0xFF;
-    //Bank 0 Adressen
-    public static final int INDF = 0x00;
-    public static final int TMR0 = 0x01;
-    public static final int PCL = 0x02;
-    public static final int STATUS = 0x03;
-    public static final int FSR = 0x04;
-    public static final int PORTA = 0x05;
-    public static final int PORTB = 0x06;
-    public static final int UNIMPLEMENTED = 0x07;
-    public static final int EEDATA = 0x08;
-    public static final int EEADR = 0x09;
-    public static final int PCLATH = 0x0A;
-    public static final int INTCON = 0x0B;
-    //Bank 1 Adressen
-    public static final int OFFSET = 0x80;
-    public static final int OPTION_REG = 0x81;
-    public static final int TRISA = 0x85;
-    public static final int TRISB = 0x86;
-    public static final int EECON1 = 0x88;
-    //GPR Adressen
-    public static final int GPR_START = 0x0C;
-    public static final int GPR_END = 0x2F;
-    //***********************************
-    public static final int PC = 0;
-    public static final int W = 1;
-    public static final int Z = 10;
-    public static final int C = 11;
-    public static final int DC = 12;
+
 
     private Stack stack;
     private int cycles;
@@ -59,9 +59,9 @@ public class Register {
     private EventListenerList listeners;
     private int regStatus;
 
-    public Register(Stack stack) {
+    public Register(Stack stack, EventListenerList listeners) {
         this.stack = stack;
-        listeners = new EventListenerList();
+        this.listeners = listeners;
         cycles = 0;
         reg = new int[0xFF];
 
@@ -120,20 +120,22 @@ public class Register {
     }
 
     public void setRegValue(int address, int value) throws NoRegisterAddressException {
-                //Adressüberprüfung
-                if (address > REG_MAX) {
-                    throw new NoRegisterAddressException(address);
-                }
-                //Unseporteten Adressbereich nicht beschreiben
-                if ((address & 0x7F) > GPR_END) {
-                    return;
-                }
-                //Überprüung ob es sich um GPR (General Purpose Registers) oder SFR (Special Function Register) Adresse handelt
-                if (((address & 0x7F) >= GPR_START) && (address & 0x7F) <= GPR_END) {
-                    writeGPR(address, value);
-                } else {
-                    writeSFR(address, value);
-                }
+        //Adressüberprüfung
+        if (address > REG_MAX) {
+            throw new NoRegisterAddressException(address);
+        }
+        //Unseporteten Adressbereich nicht beschreiben
+        if (((address & 0x7F) > GPR_END) || ((address & 0x7F) > GPR_END+OFFSET)) {
+            return;
+        }
+
+        value = value & 0xFF;
+        //Überprüung ob es sich um GPR (General Purpose Registers) oder SFR (Special Function Register) Adresse handelt
+        if (((address & 0x7F) >= GPR_START) && (address & 0x7F) <= GPR_END) {
+            writeGPR(address, value);
+        } else {
+            writeSFR(address, value);
+        }
     }
 
     //Schreibt ins General Purpose Register Bereich
@@ -298,28 +300,25 @@ public class Register {
         return this.w & 0x00FF;
     }
 
-    public int getRegStatus() {
-        return reg[STATUS];
-    }
-
     //Prüft ob ein Bit Carry vorliegt und setzt je nachdem das Carry Bit
-    public void checkCarry(int f, int w, boolean add) throws NoRegisterAddressException {
+    public void checkCarry(int valueF, int valueW, boolean add) throws NoRegisterAddressException {
         //If add=true -> Addition
-        int status = getRegStatus();
+        int status = getRegValue(STATUS);
         if (add) {
-            if((f + w) > 0xFF){
+            if((valueF + valueW) > 0xFF){
                 status = setBit(status, 0);
             } else {
                 status = clearBit(status, 0);
             }
         } else {
-            if((f - w) < 0){
+            if((valueF - valueW) < 0){
                 status = clearBit(status, 0);
             } else {
                 status = setBit(status, 0);
             }
         }
         setRegValue(STATUS, status);
+        System.out.println("TestBit Carry End: " + testBit(getRegValue(STATUS),0));
     }
 
     public void checkDC(int valueF, int valueW, boolean add) throws NoRegisterAddressException {

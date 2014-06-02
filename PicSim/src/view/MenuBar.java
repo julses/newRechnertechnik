@@ -1,6 +1,7 @@
 package view;
 
 import exceptions.NoInstructionException;
+import exceptions.NoInstructionFoundException;
 import exceptions.NoRegisterAddressException;
 import model.*;
 
@@ -20,7 +21,6 @@ public class MenuBar{
     private Converter convert = new Converter();
     private Scan scanner;
     private Pars parser;
-    private JMainWindow window;
     public Register register;
     public Path pathToSource;
 
@@ -66,16 +66,13 @@ public class MenuBar{
         fenster.setVisible(true);
     }
 
-    public void step() throws NoInstructionException, NoRegisterAddressException {
+    public void step() throws NoInstructionException, NoRegisterAddressException, NoInstructionFoundException {
         //Befehlsstring laden
         String stringopcode = scanner.getOper();
-        //System.out.println(stringopcode);
         //String in integer Umwandeln
         int instruction = convert.hexStringToInt(stringopcode);
-        //System.out.println("instruction: " + instruction);
         //Operation Code (Befehl) decodieren
         int opcode = parser.decode(instruction);
-        //System.out.println("opcode: " +opcode);
         //Instruction ausführen
         parser.exec(instruction, opcode);
     }
