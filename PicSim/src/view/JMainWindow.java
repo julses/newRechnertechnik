@@ -141,14 +141,14 @@ public class JMainWindow implements ActionListener, GUIListener {
 
 
         stack= new JTextArea();
-        JScrollPane stackPane = new JScrollPane(stack);
+        //JScrollPane stackPane = new JScrollPane(stack);
         stack.setEditable(false);
-        stackPane.setPreferredSize(new Dimension(50,150));
-        stackPane.setBorder(BorderFactory.createTitledBorder("Stack"));
-        setzePos(gbc,4,0,1,5,0,0);
-        testbag.setConstraints(stackPane,gbc);
-        ra.add(stackPane);
-        stackPane.setVisible(true);
+        stack.setPreferredSize(new Dimension(50,160));
+        stack.setBorder(BorderFactory.createTitledBorder("Stack"));
+        setzePos(gbc,4,0,1,6,0,0);
+        testbag.setConstraints(stack,gbc);
+        ra.add(stack);
+        stack.setVisible(true);
 
         // Buttons dem Panel hinzufügen
         startStopButton.setPreferredSize(new Dimension(100,20));
