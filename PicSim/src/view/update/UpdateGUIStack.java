@@ -10,22 +10,34 @@ import java.util.EventObject;
  * To change this template use File | Settings | File Templates.
  */
 public class UpdateGUIStack extends EventObject {
-    //private final int address;
-    //private final int value;
+    private int value;
+    private final int index;
+    private final boolean write;
 
-    public UpdateGUIStack(Object source, int address, int value)
+    public UpdateGUIStack(Object source, int value, int index, boolean write)
     {
         super( source );
-        //this.address = address;
-        //this.value = value;
+        this.value = value;
+        this.index = index;
+        this.write = write;
     }
-/*
-    public int getAddress() {
-        return address;
+
+    public UpdateGUIStack(Object source, int index, boolean write)
+    {
+        super( source );
+        this.index = index;
+        this.write = write;
     }
 
     public int getValue() {
         return value;
     }
-*/
+
+    public int getIndex() {
+        return index;
+    }
+
+    public boolean getWrite() {
+        return write;
+    }
 }

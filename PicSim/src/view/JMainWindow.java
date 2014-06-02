@@ -10,6 +10,7 @@ import view.update.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,9 +47,10 @@ public class JMainWindow implements ActionListener, GUIListener {
         //GridBagLayout
         GridBagLayout testbag =new GridBagLayout();
 
-        JPanel ra = new JPanel();
+        ra = new JPanel();
         ra.setBorder(BorderFactory.createTitledBorder("Benutzerdaten"));
-        JPanel reg = new JPanel();// Panel für Register Tabelle
+
+        reg = new JPanel();// Panel für Register Tabelle
         reg.setBorder(BorderFactory.createTitledBorder("Register Übersicht"));
         reg.setPreferredSize(new Dimension(250, 600));
 
@@ -95,7 +97,7 @@ public class JMainWindow implements ActionListener, GUIListener {
                 Component c = super.getTableCellRendererComponent(table, value,
                         isSelected, hasFocus, row, column);
 
-                if (row < 100 && column==0) {
+                if (row < 1000 && column==0) {
                     setBackground(Grau);
                     row++;
                 } else {
@@ -598,7 +600,34 @@ public class JMainWindow implements ActionListener, GUIListener {
      */
     @Override
     public void update(UpdateGUIStack event) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        int value = event.getValue();
+        int index = event.getIndex();
+        String Stack="";
+        if(index == -1){
+            stack.setText("");
+        } else {
+            if (event.getWrite()) {
+                Stack=Integer.toHexString(value)+"\n";
+                stack.append(Stack);
+            } else {
+                int start=0;
+                int end=0;
+                    try {
+                        start = stack.getLineStartOffset(index -1);
+                        end = stack.getLineEndOffset(index -1);
+                    } catch (BadLocationException e) {
+                        e.printStackTrace();
+                    }
+                    if(index > 1){
+                        //Sorgt dafür, dass das \n auch gelöscht wird.
+                        start = start - 1;
+                    }
+                    stack.replaceRange(null, start, end);
+
+
+                //stack.;
+            }
+        }
     }
 
 }

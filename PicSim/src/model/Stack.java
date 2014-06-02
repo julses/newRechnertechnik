@@ -1,6 +1,7 @@
 package model;
 
 import view.update.GUIListener;
+import view.update.UpdateGUIInfoField;
 import view.update.UpdateGUIRegister;
 import view.update.UpdateGUIStack;
 
@@ -30,6 +31,7 @@ public class Stack {
             //Stack voll es wird wieder bei 0 angefangen
             pointer = 0;
         }
+        notifyUpdateGUI(new UpdateGUIStack(this, value, pointer, true));
         stack[pointer++] = value & 0x1FFF; //0b0001 1111 1111 11111
     }
 
@@ -37,11 +39,13 @@ public class Stack {
         if (pointer <= 0)
             //Stack leer, es wird wieder ganz oben angefangen
             pointer = 8;
+        notifyUpdateGUI(new UpdateGUIStack(this, pointer, false));
         return stack[--pointer];
     }
 
     public void clear() {
         stack = new int[8];
+        notifyUpdateGUI(new UpdateGUIStack(this, -1, false));
     }
 
     //Ab hier werden die Eventhandler definiert

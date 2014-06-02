@@ -16,9 +16,10 @@ public class Objects {
     public static Object[] rowData;
     public static String[] columnNames;
 
-
     //Hauptelemente
     public static JFrame hauptFenster;
+    public static JPanel ra;
+    public static JPanel reg;
     public static Container container;
     // Buttonliste
     public static JButton stepButton;

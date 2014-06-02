@@ -3,9 +3,9 @@ package view;
 import javax.swing.table.AbstractTableModel;
 
 public class LstTableModel extends AbstractTableModel {
-    public String[][] row = new String[100][100];
+    public String[][] row = new String[1000][1000];
     public LstTableModel() {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             for (int j = 0; j <2; j++) {
                 if (j==0) {
                     row[i][j] ="";
