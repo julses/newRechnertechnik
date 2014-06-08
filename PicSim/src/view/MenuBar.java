@@ -22,12 +22,14 @@ public class MenuBar{
     private Scan scanner;
     private Pars parser;
     public Register register;
+    private Interrupts interrupts;
     public Path pathToSource;
 
-    public MenuBar(Pars parser, Scan scanner, Register register) {
+    public MenuBar(Pars parser, Scan scanner, Register register, Interrupts interrupts) {
         this.parser = parser;
         this.scanner = scanner;
-        this.register=register;
+        this.register = register;
+        this.interrupts= interrupts;
     }
 
     public void oeffnen() throws IOException {
@@ -67,6 +69,7 @@ public class MenuBar{
     }
 
     public void step() throws NoInstructionException, NoRegisterAddressException, NoInstructionFoundException {
+        interrupts.next();
         //Befehlsstring laden
         String stringopcode = scanner.getOper();
         //String in integer Umwandeln

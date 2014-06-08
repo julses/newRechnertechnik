@@ -1,7 +1,7 @@
 import model.Instructions;
 import model.Pars;
 import model.Register;
-import static model.Register.Adresses.*;
+import static model.Register.RegisterAdresses.*;
 import model.Stack;
 import org.junit.Test;
 

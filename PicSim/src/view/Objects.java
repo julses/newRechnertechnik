@@ -73,6 +73,7 @@ public class Objects {
     public static JTextField zerobit;
     public static JTextField dc;
     public static JTextField carry;
+    public static JTextField duration;
 
     //Beschriftungslabel
     public static JLabel labelpc;
@@ -81,9 +82,15 @@ public class Objects {
     public static JLabel labelDC;
     public static JLabel labelZ;
     public static JLabel labelC;
+    public static JLabel labelFreq;
+    public static JLabel labelDuration;
 
     //Registertabelle
     public static AbstractTableModel model;
     public static JTable tablereg;
     public static JTable tablelst;
+
+    //DropDown Quarzfrequenz
+    public static JComboBox quarz;
+
 }

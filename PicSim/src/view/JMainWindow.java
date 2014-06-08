@@ -4,7 +4,7 @@ import exceptions.NoInstructionException;
 import exceptions.NoInstructionFoundException;
 import exceptions.NoRegisterAddressException;
 
-import static model.Register.Adresses.*;
+import static model.Register.RegisterAdresses.*;
 import view.update.*;
 
 import javax.swing.*;
@@ -36,7 +36,8 @@ public class JMainWindow implements ActionListener, GUIListener {
     private RegisterTable model;
     private LstTableModel lstmodel;
     private boolean stepp=false;
-
+    private String[] frequenz={"32,76800 kHz","500,0000 kHz","1,000000 MHz","2,000000 MHz","2,457600 MHz","3,000000 MHz","3,276800 MHz","3,680000 MHz","3,686411 MHz","4,000000 MHz","4,096000 MHz","4,194304 MHz","4,433619 MHz","4,915200 MHz","5,000000 MHz","6,000000 MHz","6,144000 MHz","6,250000 MHz","6,553600 MHz","8,000000 MHz","10,00000 MHz","12,00000 MHz","16,00000 MHz","20,00000 MHz","24,00000 MHz","32,00000 MHz","40,00000 MHz","80,00000 MHz"};
+    private double[] frequency={32768, 500000, 1000000, 2000000, 2457600,3000000, 3276800, 3680000, 3686411, 4000000, 4096000, 4194304, 4433619, 4915200, 5000000, 6000000, 6144000, 6250000, 655360, 8000000, 10000000, 12000000, 16000000, 20000000, 24000000, 32000000, 40000000, 80000000};
 
     public JMainWindow(final MenuBar menuBar) {
         this.menuBar = menuBar;
@@ -71,7 +72,6 @@ public class JMainWindow implements ActionListener, GUIListener {
         container.add(reg,BorderLayout.LINE_START);
 
         // Textfeld für Lst-File erzeugen
-
         lstmodel = new view.LstTableModel();
         tablelst = new JTable(lstmodel);
 
@@ -115,30 +115,11 @@ public class JMainWindow implements ActionListener, GUIListener {
         testbag.setConstraints(scrollPane,gbc);
         ra.add( scrollPane );
 
-
-
-        /*
-        lstFile = new JTextArea("Bitte wählen sie eine .LST Datei aus.");//Textarea mit Text erstellen
-        JScrollPane scrollPane = new JScrollPane(lstFile);//Scrollbar mit oberfläche verknüpfen
-        lstFile.setEditable(false);//textfeld nich veraenderbar
-        scrollPane.setMinimumSize(new Dimension(600, 200));
-        scrollPane.setPreferredSize(new Dimension(600, 200));
-        scrollPane.setMaximumSize(new Dimension(600, 200));
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Programm"));
-        setzePos(gbc,0,8,0,0,0,1);
-        testbag.setConstraints(scrollPane,gbc);
-        ra.add(scrollPane);//Texfeld mit Scrollbar dem
-        scrollPane.setVisible(true);//Alles sichtbar machen
-        */
-
-
-
         /* Stack-Jtextarea mit Grenze "Stack" dem Scrollfeld stackpane hinzugefügt.
          Danach mit dem JPanel "ra" verknüpft.
          setzePos() legt die Position des Textfeldes in der Anzeige Fest.
 
         */
-
 
         stack= new JTextArea();
         //JScrollPane stackPane = new JScrollPane(stack);
@@ -234,13 +215,11 @@ public class JMainWindow implements ActionListener, GUIListener {
         pc.setBackground(Grau);
         setzePos(gbc,1,5,1,1,0,0);
         testbag.setConstraints(pc,gbc);
-
         ra.add(pc);
 
         setzePos(gbc,0,6,1,1,0,0);
         testbag.setConstraints(labelwreg,gbc);
         ra.add(labelwreg);
-
 
         wreg=new JTextField("",4);
         wreg.setEditable(false);
@@ -250,20 +229,9 @@ public class JMainWindow implements ActionListener, GUIListener {
         testbag.setConstraints(wreg,gbc);
         ra.add(wreg);
 
-        /*setzePos(gbc,0,7,1,1,0,0);
-        testbag.setConstraints(labelSFR,gbc);
-        ra.add(labelSFR);
-
-        SFR = new JTextField("",4);
-        SFR.setEditable(false);
-        setzePos(gbc,1,7,1,1,0,0);
-        testbag.setConstraints(SFR,gbc);
-        ra.add(SFR);*/
-
         setzePos(gbc,0,7,1,1,0,0);
         testbag.setConstraints(labelZ,gbc);
         ra.add(labelZ);
-
 
         zerobit = new JTextField("",4);
         zerobit.setEditable(false);
@@ -297,6 +265,28 @@ public class JMainWindow implements ActionListener, GUIListener {
         testbag.setConstraints(carry,gbc);
         ra.add(carry);
 
+        setzePos(gbc,0,10,1,1,0,0);
+        testbag.setConstraints(labelDuration,gbc);
+        ra.add(labelDuration);
+
+        duration = new JTextField("",4);
+        duration.setEditable(false);
+        duration.setForeground(Color.black);
+        duration.setBackground(Grau);
+        setzePos(gbc, 1, 10, 1, 1, 0, 0);
+        testbag.setConstraints(duration,gbc);
+        ra.add(duration);
+
+        setzePos(gbc,0,11,1,1,0,0);
+        testbag.setConstraints(labelFreq,gbc);
+        ra.add(labelFreq);
+
+        quarz = new JComboBox(frequenz);
+        quarz.setEditable(false);
+        quarz.setSelectedIndex(9);
+        setzePos(gbc, 1, 11, 1, 1, 0, 0);
+        testbag.setConstraints(quarz,gbc);
+        ra.add(quarz);
 
 
         //Scrollbar und Tabelle für Register
@@ -444,6 +434,8 @@ public class JMainWindow implements ActionListener, GUIListener {
         labelZ= new JLabel("Z:");
         labelC=new JLabel("C:");
         labelDC=new JLabel("DC:");
+        labelDuration = new JLabel("Laufzeit");
+        labelFreq = new JLabel("Quarzfrequenz");
     }
 
     public void actionPerformed(ActionEvent object) {
@@ -575,7 +567,7 @@ public class JMainWindow implements ActionListener, GUIListener {
     }
 
     /*
-     *Aktualisiert die Felder PC,W,Carry,DigitalCarry,ZeroBit
+     *Aktualisiert die Felder PC, W, Carry, DigitalCarry, ZeroBit und Laufzeit
      */
     @Override
     public void update(UpdateGUIInfoField event) {
@@ -592,6 +584,13 @@ public class JMainWindow implements ActionListener, GUIListener {
                 dc.setText(String.valueOf(menuBar.register.testBit(value, 1)));
                 zerobit.setText(String.valueOf(menuBar.register.testBit(value, 2)));
                 break;
+            case Duration:
+                double frequency = this.frequency[quarz.getSelectedIndex()];
+                double time = (4/frequency)*1000000; //Zeit für einen Cycle
+                time = Math.round(time*1000)/1000.0; //Laufzeit wird auf drei Nachkommastellen gerundet
+                double durationTime = time * value;
+                System.out.println(durationTime + " \u00B5"+"s");
+                duration.setText(String.valueOf(durationTime + " \u00B5"+"s"));
         }
     }
 
@@ -602,30 +601,25 @@ public class JMainWindow implements ActionListener, GUIListener {
     public void update(UpdateGUIStack event) {
         int value = event.getValue();
         int index = event.getIndex();
-        String Stack="";
         if(index == -1){
             stack.setText("");
         } else {
             if (event.getWrite()) {
-                Stack=Integer.toHexString(value)+"\n";
-                stack.append(Stack);
+                stack.append(Integer.toHexString(value) + "\n");
             } else {
-                int start=0;
-                int end=0;
-                    try {
-                        start = stack.getLineStartOffset(index -1);
-                        end = stack.getLineEndOffset(index -1);
-                    } catch (BadLocationException e) {
-                        e.printStackTrace();
-                    }
-                    if(index > 1){
-                        //Sorgt dafür, dass das \n auch gelöscht wird.
-                        start = start - 1;
-                    }
-                    stack.replaceRange(null, start, end);
-
-
-                //stack.;
+                int start = 0;
+                int end = 0;
+                try {
+                    start = stack.getLineStartOffset(index -1);
+                    end = stack.getLineEndOffset(index -1);
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
+                if(index > 1){
+                    //Sorgt dafür, dass das \n auch gelöscht wird.
+                    start = start - 1;
+                }
+                stack.replaceRange(null, start, end);
             }
         }
     }

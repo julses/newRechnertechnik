@@ -23,7 +23,7 @@ public class PicSim {
         Interrupts interrupts = new Interrupts(register);
         Scan scanner = new Scan(register);
         Pars parser = new Pars(instructions);
-        MenuBar menubar = new MenuBar(parser, scanner, register);
+        MenuBar menubar = new MenuBar(parser, scanner, register, interrupts);
         register.addGUIListener(new JMainWindow(menubar));
     }
 

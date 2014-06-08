@@ -1,6 +1,6 @@
 package model;
 
-import static model.Register.Adresses.*;
+import static model.Register.RegisterAdresses.*;
 import exceptions.NoRegisterAddressException;
 import view.update.GUIListener;
 import view.update.UpdateGUIInfoField;
@@ -17,7 +17,7 @@ import javax.swing.event.EventListenerList;
  * To change this template use File | Settings | File Templates.
  */
 public class Register {
-    public class Adresses {
+    public class RegisterAdresses {
         //***********************************
         //Register Adressen
         public static final int REG_MAX = 0xFF;
@@ -46,9 +46,8 @@ public class Register {
         //***********************************
         public static final int PC = -1;
         public static final int W = -2;
+        public static final int Duration = -3;
     }
-
-
 
     private Stack stack;
     private int cycles;
@@ -68,11 +67,13 @@ public class Register {
         valueOnReset();
     }
 
-    //Power On Reset bei laden einer Datei
+    //Power On Reset z.b. bei laden einer Datei
     public void valueOnReset(){
         try {
             //Clear W
             w = 0;
+            //Clear Duration
+            clearCycles();
             //Clear Stack
             stack.clear();
             //Register Reset
@@ -99,6 +100,7 @@ public class Register {
     }
 
     //Methode für das direkte setzen von Ports durch User Input
+    //würde setRegValue benutzt werden, würde eine Schleife entstehen
     public void setPort(int address, boolean selected, int bit) {
         int value;
         //Maskierung für PortA
@@ -119,6 +121,7 @@ public class Register {
         }
     }
 
+    //Normaler Schreibbefehl
     public void setRegValue(int address, int value) throws NoRegisterAddressException {
         //Adressüberprüfung
         if (address > REG_MAX) {
@@ -144,7 +147,7 @@ public class Register {
         reg[address & 0x7F] = value;
         // Vorderes Bit durch Veroderung hinzufügen
         reg[address | 0x80] = value;
-        //GUI updaten
+        //Benachrichtigt GUI
         notifyUpdateGUI(new UpdateGUIRegister(this, selectBank(address), value));
     }
 
@@ -220,7 +223,7 @@ public class Register {
                 //nicht spiegeln
                 reg[address] = value;
         }
-        //GUI updaten
+        //Benachrichtigt GUI
         notifyUpdateGUI(new UpdateGUIRegister(this, selectBank(address), value));
     }
 
@@ -321,6 +324,7 @@ public class Register {
         System.out.println("TestBit Carry End: " + testBit(getRegValue(STATUS),0));
     }
 
+    // Überprüft ob ein DigitalCarry vorliegt
     public void checkDC(int valueF, int valueW, boolean add) throws NoRegisterAddressException {
         int status = getRegValue(STATUS);
         //If add=true -> Addition
@@ -357,9 +361,16 @@ public class Register {
         return testBit(getRegValue(STATUS), 2);
     }
 
+    //Setzt Cycles zurück
+    public void clearCycles() {
+        this.cycles = 0;
+        notifyUpdateGUI(new UpdateGUIInfoField(this, Duration, this.cycles));
+    }
+
     //Inkrementiert Cycles
     public void incCycles() throws NoRegisterAddressException {
         this.cycles++;
+        notifyUpdateGUI(new UpdateGUIInfoField(this, Duration, this.cycles));
     }
 
     //Setzt das Bit auf 1

@@ -2,7 +2,7 @@ package model;
 
 import exceptions.NoRegisterAddressException;
 
-import static model.Register.Adresses.*;
+import static model.Register.RegisterAdresses.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,7 +29,7 @@ public class Interrupts {
         int prevPortB = this.prevPortB;
 
         //RA4
-        if (prevPortA != -1) {
+        if(prevPortA > -1) {
             int RA4 = (register.testBit(portA, 4)) ? 1 : 0;
             int prevRA4 = (register.testBit(prevPortA, 4)) ? 1 : 0;
 
@@ -38,16 +38,15 @@ public class Interrupts {
             }
         }
         //RB0
-        if (prevPortB != -1) {
+        if (prevPortB > -1) {
             INTInterrupt();
             PortRBInterrupt();
         }
-        //checkINTInterrupt();
-        //checkPortRBInterrupt();
-        //checkTMR0Interrupt();
+        checkINTInterrupt();
+        checkPortRBInterrupt();
+        checkTMR0Interrupt();
         this.prevPortA = portA;
         this.prevPortB = portB;
-
     }
 
     private void PortRA4Interrupt() throws NoRegisterAddressException {
@@ -98,6 +97,65 @@ public class Interrupts {
                 }
             }
         }
+    }
+
+
+    /*
+     * Prüfen ob ein INT Interrupt aufgetreten ist
+     */
+    private void checkINTInterrupt() throws NoRegisterAddressException {
+        //GIE = 1, INTE = 1 und INTf = 1?
+        if (register.testBit(INTCON, 7) && register.testBit(INTCON, 4) && register.testBit(INTCON, 1)) {
+            executeInterrupt();
+        }
+    }
+
+    /*
+     * Prüfen ob ein Port RB Interrupt aufgetreten ist
+     */
+    private void checkPortRBInterrupt() throws NoRegisterAddressException {
+        if (register.testBit(INTCON, 0)) {
+            //GIE = 1 und RBIE = 1?
+            if (register.testBit(INTCON, 7) && register.testBit(INTCON, 3)) {
+                executeInterrupt();
+            }
+        }
+    }
+
+    /*
+     * Prüfen ob ein TMR0 Interrupt aufgetreten ist
+     */
+    private void checkTMR0Interrupt() throws NoRegisterAddressException {
+        //T0CS != 1 -> timer mode aktive
+        if (!register.testBit(register.getRegValue(OPTION_REG), 5)) {
+            // TMR0++
+            int value = (register.getRegValue(TMR0) + 1) & 0x0FF;
+            register.setRegValue(TMR0, value);
+
+            // TMR0 Overflow?
+            if (register.getRegValue(TMR0) == 0x00) {
+                // T0IF = 1
+                register.setRegValue(INTCON, register.setBit(register.getRegValue(INTCON), 2));
+            }
+        }
+
+        // GIE = 1, T0IE = 1 und TOIF = 1
+        if (register.testBit(register.getRegValue(INTCON), 7) && register.testBit(register.getRegValue(INTCON), 5) && register.testBit(register.getRegValue(INTCON), 2)) //execute the interrupt
+        {
+            executeInterrupt();
+        }
+    }
+
+    /*
+     * Interrupt ausführen
+     */
+    private void executeInterrupt() throws NoRegisterAddressException {
+        int intcon = register.getRegValue(INTCON);
+        //set GIE to 0
+        intcon = register.clearBit(intcon, 7);
+        register.setRegValue(INTCON, intcon);
+        //stack.push(register.getPC());
+        register.setPC(0x04);
     }
 
 }

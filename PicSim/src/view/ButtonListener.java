@@ -2,10 +2,9 @@ package view;
 
 import javax.swing.*;
 
-import static model.Register.Adresses.*;
+import static model.Register.RegisterAdresses.*;
 
 import java.awt.*;
-import java.awt.datatransfer.SystemFlavorMap;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
@@ -148,6 +147,7 @@ public class ButtonListener implements ActionListener {
             BufferedReader br1 = new BufferedReader(fr1);
             lnr1 = new LineNumberReader(br1);
             String zeile ;
+            String splited[];
             int linenr1;
             while ((zeile = lnr1.readLine())!=null) {
 
@@ -159,22 +159,20 @@ public class ButtonListener implements ActionListener {
                 String lineNumber = "";
 
                 // fuehrende Whitespaces entfernen und nach Whitespaces splitten
-                String[] splited = zeile.trim().split("(\\s)+");
+                 splited = zeile.trim().split("(\\s)+");
                 while (true) {
-
+                    // fuehrende Whitespaces entfernen und nach Whitespaces splitten
+                    splited = zeile.trim().split("(\\s)+");
                     // wenn es eine Zeile ohne Binaercode ist, ist Zeilennummer
                     // der erste Block des Strings
-                    if (splited[0].length() == 5
-                            && splited[0].matches("(\\d){5}")) {
-
+                    if (splited[0].length() == 5 && splited[0].matches("(\\d){5}")) {
                         lineNumber = splited[0];
 
                         // wenn die Laenge = 2 ist, muss zweite Stelle ein
                         // Kommentar oder ein Label sein ->
                         // deshalb ueberpruefung auf Kommentar -> wenn nicht als
                         // Label speichern
-                        if (splited.length == 2
-                                && !(splited[1].startsWith(";"))) {
+                        if (splited.length == 2 && !(splited[1].startsWith(";"))) {
                             label = splited[1];
                         }
 
@@ -230,8 +228,7 @@ public class ButtonListener implements ActionListener {
                 linenr1 =lnr1.getLineNumber();
                 linenr1--;
                 mainWindow.setLST(ergebnis,(linenr1));
-                zeile = br1.readLine();
-            }
+                }
             br1.close();
         } catch (IOException e)
         {

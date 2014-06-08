@@ -1,7 +1,7 @@
 package model;
 
 import exceptions.NoRegisterAddressException;
-import static model.Register.Adresses.*;
+import static model.Register.RegisterAdresses.*;
 
 /**
  * Created with IntelliJ IDEA.
