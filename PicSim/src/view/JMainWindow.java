@@ -587,8 +587,8 @@ public class JMainWindow implements ActionListener, GUIListener {
             case Duration:
                 double frequency = this.frequency[quarz.getSelectedIndex()];
                 double time = (4/frequency)*1000000; //Zeit für einen Cycle
-                time = Math.round(time*1000)/1000.0; //Laufzeit wird auf drei Nachkommastellen gerundet
                 double durationTime = time * value;
+                durationTime = Math.round(durationTime*1000)/1000.0; //Laufzeit wird auf drei Nachkommastellen gerundet
                 System.out.println(durationTime + " \u00B5"+"s");
                 duration.setText(String.valueOf(durationTime + " \u00B5"+"s"));
         }
