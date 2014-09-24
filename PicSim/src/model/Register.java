@@ -52,6 +52,7 @@ public class Register {
     private Stack stack;
     private int cycles;
     private int w; //W-Register
+    private int PCH = 0x00;
     private int[] reg;
     private int latchPortA;
     private int latchPortB;
@@ -272,15 +273,16 @@ public class Register {
 
     //Gibt den PC zurück
     public int getPC() {
-        return (reg[PCLATH] << 8) + reg[PCL];
+        return ((PCH << 8) + reg[PCL]);
     }
 
     //Setzt den PC auf übergebenen Wert
     public void setPC(int pc) throws NoRegisterAddressException {
         //Oberen 5 bit im PCLATH speichern
-        setRegValue(PCLATH, (pc & 0x1F00) >> 8); //0b0001 1111 0000 0000 >> 0b0000 0000 0001 1111
+        PCH = ((pc & 0x1F00) >> 8); //0b0001 1111 0000 0000 >> 0b0000 0000 0001 1111
         //Unteren 8 bit im PCL speichern
         setRegValue(PCL, pc & 0x00FF);    //0b0000 0000 1111 1111
+        notifyUpdateGUI(new UpdateGUIInfoField(this, PC, pc));
     }
 
     //Inkrementiert den PC
