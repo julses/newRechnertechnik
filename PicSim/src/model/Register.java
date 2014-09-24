@@ -71,6 +71,8 @@ public class Register {
     //Power On Reset z.b. bei laden einer Datei
     public void valueOnReset(){
         try {
+            //ProgramCounter High
+            PCH = 0x00;
             //Clear W
             w = 0;
             //Clear Duration
