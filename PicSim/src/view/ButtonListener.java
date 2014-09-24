@@ -73,14 +73,10 @@ public class ButtonListener implements ActionListener {
             menuBar.reset();
         }
         if (object.getSource() == einstellungen) {
-            System.out.println("einstellungen wurde angeklickt");
+            System.out.println("Einstellungen wurde angeklickt");
         }
         if (object.getSource() == doku) {
-            System.out.println("doku wurde angeklickt");
-            if (Desktop.isDesktopSupported()) {
-                try { Desktop.getDesktop().open(new File("./Dokumente/pic16f84A.pdf")); }
-                catch (IOException e1) { e1.printStackTrace(); }
-            }
+            menuBar.openDoku();
         }
         if (object.getSource() == about) {
             menuBar.ueber();
@@ -130,6 +126,7 @@ public class ButtonListener implements ActionListener {
     private void open() {
         try {
             menuBar.oeffnen();
+            if(menuBar.pathToSource != null){
             FileReader fr = new FileReader(String.valueOf(menuBar.pathToSource));
             BufferedReader br = new BufferedReader(fr);
             lnr = new LineNumberReader(br);
@@ -230,6 +227,7 @@ public class ButtonListener implements ActionListener {
                 mainWindow.setLST(ergebnis,(linenr1));
                 }
             br1.close();
+            }
         } catch (IOException e)
         {
             e.printStackTrace();

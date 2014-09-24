@@ -6,6 +6,8 @@ import exceptions.NoRegisterAddressException;
 import model.*;
 
 import javax.swing.*;
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -42,9 +44,11 @@ public class MenuBar{
         if (rueckgabeWert == JFileChooser.APPROVE_OPTION) {
             // Ausgabe der ausgewaehlten Datei
             pathToSource = chooser.getSelectedFile().toPath();
-            System.out.println("Die zu öffnende Datei befindet sich hier:\n" + pathToSource);
-            scanner.setPathToLSTFile(pathToSource);
-            scanner.reader();
+            if(pathToSource != null) {
+                System.out.println("Die zu öffnende Datei befindet sich hier:\n" + pathToSource);
+                scanner.setPathToLSTFile(pathToSource);
+                scanner.reader();
+            }
         }
     }
 
@@ -82,6 +86,13 @@ public class MenuBar{
 
     public void reset() {
         scanner.reset();
+    }
+
+    public void openDoku() {
+        if (Desktop.isDesktopSupported()) {
+            try { Desktop.getDesktop().open(new File("./Dokumente/Doku.pdf")); }
+            catch (IOException e1) { e1.printStackTrace(); }
+        }
     }
 
 }
