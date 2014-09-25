@@ -3,8 +3,6 @@ package view;
 import exceptions.NoInstructionException;
 import exceptions.NoInstructionFoundException;
 import exceptions.NoRegisterAddressException;
-
-import static model.Register.RegisterAdresses.*;
 import view.update.*;
 
 import javax.swing.*;
@@ -15,6 +13,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static model.Register.RegisterAdresses.*;
 import static view.Objects.*;
 
 /**
@@ -83,18 +82,18 @@ public class JMainWindow implements ActionListener, GUIListener {
         tablelst.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         int INDEX_COLUMN1 = 0;
         TableColumn col = tablelst.getColumnModel().getColumn(INDEX_COLUMN1);
-        col.setPreferredWidth(100);
+        col.setPreferredWidth(50);
 
-        INDEX_COLUMN1 = 1;
+        INDEX_COLUMN1 = 6;
         col = tablelst.getColumnModel().getColumn(INDEX_COLUMN1);
-        col.setPreferredWidth(500);
+        col.setPreferredWidth(250);
         tablelst.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                                                            boolean isSelected, boolean hasFocus,
                                                            int row, int column) {
 
-                Component c = super.getTableCellRendererComponent(table, value,
+                super.getTableCellRendererComponent(table, value,
                         isSelected, hasFocus, row, column);
 
                 if (row < 1000 && column==0) {
@@ -109,7 +108,7 @@ public class JMainWindow implements ActionListener, GUIListener {
         });
         //tablelst.setEnabled(false);
         JScrollPane scrollPane = new JScrollPane(tablelst);
-        scrollPane.setPreferredSize(new Dimension(600,200));
+        scrollPane.setPreferredSize(new Dimension(700,200));
         scrollPane.setVisible(true);
         setzePos(gbc,0,12,0,0,0,1);
         testbag.setConstraints(scrollPane,gbc);
@@ -446,8 +445,10 @@ public class JMainWindow implements ActionListener, GUIListener {
     public void step() {
         try {
             int zeile= menuBar.register.getPC();
-            System.out.println("Dies ist zeile :"+zeile);
-            if (lstmodel.getValueAt(zeile,0).equals("b")&& stepp==true){
+            String zeilehex=Integer.toHexString(menuBar.register.getPC());
+            System.out.println("Dies ist Adresse :"+zeilehex);
+            tablelst.changeSelection((buttonListener.lineConverter[zeile]-1), 0, true, true);
+            if (lstmodel.getValueAt((buttonListener.lineConverter[zeile]-1),0).equals("b")){
                 System.out.println("Stop");
                 stop();
                 }
@@ -509,8 +510,25 @@ public class JMainWindow implements ActionListener, GUIListener {
         gbc.weighty   = wy;
     }
 
-    public void setLST(String zeile,int zeilennr){
-        lstmodel.setValueAt(zeile,zeilennr,1);
+    public void setLST(String zeile,int zeilennr,String label,String comment,String lineNumber,String address,String opcode, String command){
+       for (int i=1;i<7;i++)
+       {    switch (i){
+           case(1):
+               lstmodel.setValueAt(address,zeilennr,1);
+           case(2):
+               lstmodel.setValueAt(opcode,zeilennr,2);
+           case(3):
+               lstmodel.setValueAt(lineNumber,zeilennr,3);
+           case (4):
+               lstmodel.setValueAt(label,zeilennr,4);
+           case(5):
+               lstmodel.setValueAt(command,zeilennr,5);
+           case(6):
+               lstmodel.setValueAt(comment,zeilennr,6);
+
+             }
+       }
+
     }
 
     /*

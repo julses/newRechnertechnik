@@ -29,6 +29,7 @@ public class ButtonListener implements ActionListener {
     private LineNumberReader lnr1 =null;
     public  int linenumber;
     public int linie=0;
+    public int[] lineConverter;
 
     private JMainWindow mainWindow;
 
@@ -126,7 +127,6 @@ public class ButtonListener implements ActionListener {
     private void open() {
         try {
             menuBar.oeffnen();
-            if(menuBar.pathToSource != null){
             FileReader fr = new FileReader(String.valueOf(menuBar.pathToSource));
             BufferedReader br = new BufferedReader(fr);
             lnr = new LineNumberReader(br);
@@ -134,12 +134,13 @@ public class ButtonListener implements ActionListener {
             int linenr = 0;
             while ((line = lnr.readLine()) != null) {
                 linenr = lnr.getLineNumber();
-
             }
             linie =linenr;
             System.out.println(linie);
-
             br.close();
+
+            lineConverter = new int[linenr];
+
             FileReader fr1 = new FileReader(String.valueOf(menuBar.pathToSource));
             BufferedReader br1 = new BufferedReader(fr1);
             lnr1 = new LineNumberReader(br1);
@@ -155,8 +156,6 @@ public class ButtonListener implements ActionListener {
                 String command = "";
                 String lineNumber = "";
 
-                // fuehrende Whitespaces entfernen und nach Whitespaces splitten
-                 splited = zeile.trim().split("(\\s)+");
                 while (true) {
                     // fuehrende Whitespaces entfernen und nach Whitespaces splitten
                     splited = zeile.trim().split("(\\s)+");
@@ -217,17 +216,21 @@ public class ButtonListener implements ActionListener {
                     command = comAndCom;
                 }
 
+                if(!address.isEmpty()){
+                    //System.out.println("Addresse ist leer: " + lineNumber);
+                    lineConverter[Integer.parseInt(address, 16)] = Integer.parseInt(lineNumber);
+                    System.out.println("Wert in Array an Stelle " + address + " mit Wert: " + lineNumber);
+                }
                 // Codezeile erzeugen
-                String ergebnis = address+" "+ opcode+" "+lineNumber+" "+label+" "+ command+" "+comment;
+                String ergebnis = lineNumber+" "+label+" "+ command+" "+comment;
 
                 String pc= String.valueOf(menuBar.register.getPC());
                 if(label.equals("start")){linenumber=Integer.parseInt(lineNumber);}
                 linenr1 =lnr1.getLineNumber();
                 linenr1--;
-                mainWindow.setLST(ergebnis,(linenr1));
+                mainWindow.setLST(ergebnis, linenr1,label,comment,lineNumber,address,opcode,command);
                 }
             br1.close();
-            }
         } catch (IOException e)
         {
             e.printStackTrace();

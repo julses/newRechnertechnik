@@ -6,7 +6,7 @@ public class LstTableModel extends AbstractTableModel {
     public String[][] row = new String[1000][1000];
     public LstTableModel() {
         for (int i = 0; i < 1000; i++) {
-            for (int j = 0; j <2; j++) {
+            for (int j = 0; j <7; j++) {
                 if (j==0) {
                     row[i][j] ="";
                                     }
@@ -18,7 +18,7 @@ public class LstTableModel extends AbstractTableModel {
     }
 
     public int getColumnCount() {
-        return 2;
+        return 7;
     }
 
     public int getRowCount() {
@@ -39,7 +39,18 @@ public class LstTableModel extends AbstractTableModel {
             case 0:
                 return "BR";
             case 1:
-                return "Programmcodes";
+                return "Adresse";
+            case 2:
+                return "Befehl(Hex)";
+
+            case 3:
+                return "LineNumber";
+            case 4:
+                return "Label";
+            case 5:
+                return "Befehl";
+            case 6:
+                return "Kommentare";
 
             default:
                 return null;
