@@ -87,25 +87,9 @@ public class JMainWindow implements ActionListener, GUIListener {
         INDEX_COLUMN1 = 6;
         col = tablelst.getColumnModel().getColumn(INDEX_COLUMN1);
         col.setPreferredWidth(250);
-        tablelst.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus,
-                                                           int row, int column) {
+        tablelst.setDefaultRenderer(Object.class, new LSTTabelrenderer());
 
-                super.getTableCellRendererComponent(table, value,
-                        isSelected, hasFocus, row, column);
 
-                if (row < 1000 && column==0) {
-                    setBackground(Grau);
-                    row++;
-                } else {
-                    setBackground(Color.WHITE);
-                }
-
-                return this;
-            }
-        });
         //tablelst.setEnabled(false);
         JScrollPane scrollPane = new JScrollPane(tablelst);
         scrollPane.setPreferredSize(new Dimension(700,200));
@@ -291,27 +275,8 @@ public class JMainWindow implements ActionListener, GUIListener {
         //Scrollbar und Tabelle für Register
         model = new RegisterTable();
         tablereg = new JTable(model);
-        tablereg.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table,
-                                                           Object value, boolean isSelected, boolean hasFocus,
-                                                           int row, int column) {
-
-                Component c = super.getTableCellRendererComponent(table, value,
-                        isSelected, hasFocus, row, column);
-
-                if (row < 32 && column==0) {
-
-                    setBackground(Grau);
-                    row++;
-                } else {
-                    setBackground(Color.WHITE);
-                }
-
-                return this;
-            }
-        });
-        tablereg.setEnabled(false);
+        tablereg.setDefaultRenderer(Object.class, new REGTabelRenderer());
+                tablereg.setEnabled(false);
         JScrollPane scrolltable = new JScrollPane(tablereg);
         scrolltable.setPreferredSize(new Dimension(250,535));
         scrolltable.setVisible(true);
@@ -445,9 +410,6 @@ public class JMainWindow implements ActionListener, GUIListener {
     public void step() {
         try {
             int zeile= menuBar.register.getPC();
-            String zeilehex=Integer.toHexString(menuBar.register.getPC());
-            System.out.println("Dies ist Adresse :"+zeilehex);
-            tablelst.changeSelection((buttonListener.lineConverter[zeile]-1), 0, true, true);
             if (lstmodel.getValueAt((buttonListener.lineConverter[zeile]-1),0).equals("b")){
                 System.out.println("Stop");
                 stop();
@@ -455,6 +417,9 @@ public class JMainWindow implements ActionListener, GUIListener {
             else{
                 try {
                     menuBar.step();
+                    String zeilehex=Integer.toHexString(menuBar.register.getPC());
+                    System.out.println("Dies ist Adresse :"+zeilehex);
+                    tablelst.changeSelection((buttonListener.lineConverter[zeile]), 0, false, false);
                 } catch (NoInstructionFoundException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
