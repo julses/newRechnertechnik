@@ -409,22 +409,13 @@ public class JMainWindow implements ActionListener, GUIListener {
     //Führt nächsten Befehl im Programm aus
     public void step() {
         try {
-            int zeile= menuBar.register.getPC();
-            if (lstmodel.getValueAt((buttonListener.lineConverter[zeile]-1),0).equals("b")){
-                System.out.println("Stop");
-                stop();
-                }
-            else{
-                try {
-                    menuBar.step();
-                } catch (NoInstructionFoundException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-            }
+            menuBar.step();
         } catch (NoInstructionException e) {
-            e.printStackTrace();
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (NoRegisterAddressException e) {
-            e.printStackTrace();
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (NoInstructionFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 
@@ -556,6 +547,9 @@ public class JMainWindow implements ActionListener, GUIListener {
             case PC:
                 pc.setText(String.valueOf(Integer.toHexString(value)));
                 tablelst.changeSelection((buttonListener.lineConverter[value])-1, 0, false, false);
+                if (lstmodel.getValueAt((buttonListener.lineConverter[value]-1),0).equals("b")){
+                        stop();
+                    }
                 break;
             case W:
                 wreg.setText(String.valueOf(Integer.toHexString(value)));
