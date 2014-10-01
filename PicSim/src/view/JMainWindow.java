@@ -417,9 +417,6 @@ public class JMainWindow implements ActionListener, GUIListener {
             else{
                 try {
                     menuBar.step();
-                    String zeilehex=Integer.toHexString(menuBar.register.getPC());
-                    System.out.println("Dies ist Adresse :"+zeilehex);
-                    tablelst.changeSelection((buttonListener.lineConverter[zeile]), 0, false, false);
                 } catch (NoInstructionFoundException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
@@ -558,6 +555,7 @@ public class JMainWindow implements ActionListener, GUIListener {
         switch (event.getField()) {
             case PC:
                 pc.setText(String.valueOf(Integer.toHexString(value)));
+                tablelst.changeSelection((buttonListener.lineConverter[value])-1, 0, false, false);
                 break;
             case W:
                 wreg.setText(String.valueOf(Integer.toHexString(value)));

@@ -44,7 +44,7 @@ public class Scan {
     //Liest Datei ein und schreibt Befehle in eine Hexcode Liste
     public void reader() throws IOException {
         hexCode = new ArrayList<String>();
-        register.valueOnReset();
+        //register.valueOnReset();
         FileReader fr = new FileReader(String.valueOf(pathToLSTFile));
         BufferedReader br = new BufferedReader(fr);
 

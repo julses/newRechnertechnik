@@ -231,6 +231,7 @@ public class ButtonListener implements ActionListener {
                 mainWindow.setLST(ergebnis, linenr1,label,comment,lineNumber,address,opcode,command);
                 }
             br1.close();
+            menuBar.register.valueOnReset();
         } catch (IOException e)
         {
             e.printStackTrace();
