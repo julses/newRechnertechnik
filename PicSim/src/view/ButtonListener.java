@@ -1,13 +1,11 @@
 package view;
 
 import javax.swing.*;
-
-import static model.Register.RegisterAdresses.*;
-
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+
+import static model.Register.RegisterAdresses.*;
 
 import static view.Objects.*;
 
@@ -22,13 +20,8 @@ public class ButtonListener implements ActionListener {
 
     private final MenuBar menuBar;
     private boolean running;
-    private String pc;
-    private String lineNum;
-    private String comment;
     private LineNumberReader lnr =null;
     private LineNumberReader lnr1 =null;
-    public  int linenumber;
-    public int linie=0;
     public int[] lineConverter;
 
     private JMainWindow mainWindow;
@@ -127,11 +120,14 @@ public class ButtonListener implements ActionListener {
     private void open() {
         try {
             menuBar.oeffnen();
+
+            int linenumber;
+            int linie = 0;
+            int linenr = 0;
             FileReader fr = new FileReader(String.valueOf(menuBar.pathToSource));
             BufferedReader br = new BufferedReader(fr);
             lnr = new LineNumberReader(br);
             String line;
-            int linenr = 0;
             while ((line = lnr.readLine()) != null) {
                 linenr = lnr.getLineNumber();
             }
@@ -139,7 +135,7 @@ public class ButtonListener implements ActionListener {
             System.out.println(linie);
             br.close();
 
-            lineConverter = new int[linenr];
+            lineConverter = new int[linenr]; // array für PC - Zeilen umrechnung
 
             FileReader fr1 = new FileReader(String.valueOf(menuBar.pathToSource));
             BufferedReader br1 = new BufferedReader(fr1);
@@ -171,11 +167,8 @@ public class ButtonListener implements ActionListener {
                         if (splited.length == 2 && !(splited[1].startsWith(";"))) {
                             label = splited[1];
                         }
-
                         break;
-
-                        // wenn es eine Zeile mit Binarcode ist, sind Teile 1, 2
-                        // und 3 klar.
+                        // wenn es eine Zeile mit Binarcode ist, sind Teile 1, 2 und 3 klar.
                     } else if (splited[0].length() == 4) {
                         address = splited[0];
                         opcode = splited[1];
@@ -189,8 +182,7 @@ public class ButtonListener implements ActionListener {
 
                 for (int l = 1; l < splited.length; l++) {
                     if (splited.length > 2) {
-                        // wenn Assemblercodezeile -> haenge alles ab Stelle 4
-                        // an
+                        // wenn Assemblercodezeile -> haenge alles ab Stelle 4 an
                         if (l > 2 && splited[0].length() == 4) {
                             cAndCBuilder.append(splited[l] + " ");
 
@@ -219,18 +211,17 @@ public class ButtonListener implements ActionListener {
                 if(!address.isEmpty()){
                     //System.out.println("Addresse ist leer: " + lineNumber);
                     lineConverter[Integer.parseInt(address, 16)] = Integer.parseInt(lineNumber);
-                    System.out.println("Wert in Array an Stelle " + address + " mit Wert: " + lineNumber);
                 }
                 // Codezeile erzeugen
                 String ergebnis = lineNumber+" "+label+" "+ command+" "+comment;
 
-                String pc= String.valueOf(menuBar.register.getPC());
                 if(label.equals("start")){linenumber=Integer.parseInt(lineNumber);}
-                linenr1 =lnr1.getLineNumber();
-                linenr1--;
-                mainWindow.setLST(ergebnis, linenr1,label,comment,lineNumber,address,opcode,command);
+                    linenr1 =lnr1.getLineNumber();
+                    linenr1--;
+                    mainWindow.setLST(linenr1,label,comment,lineNumber,address,opcode,command);
                 }
             br1.close();
+
             menuBar.register.valueOnReset();
         } catch (IOException e)
         {

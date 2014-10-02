@@ -463,25 +463,13 @@ public class JMainWindow implements ActionListener, GUIListener {
         gbc.weighty   = wy;
     }
 
-    public void setLST(String zeile,int zeilennr,String label,String comment,String lineNumber,String address,String opcode, String command){
-       for (int i=1;i<7;i++)
-       {    switch (i){
-           case(1):
-               lstmodel.setValueAt(address,zeilennr,1);
-           case(2):
-               lstmodel.setValueAt(opcode,zeilennr,2);
-           case(3):
-               lstmodel.setValueAt(lineNumber,zeilennr,3);
-           case (4):
-               lstmodel.setValueAt(label,zeilennr,4);
-           case(5):
-               lstmodel.setValueAt(command,zeilennr,5);
-           case(6):
-               lstmodel.setValueAt(comment,zeilennr,6);
-
-             }
-       }
-
+    public void setLST(int zeilennr, String label, String comment, String lineNumber, String address, String opcode, String command){
+        lstmodel.setValueAt(address,zeilennr,1);
+        lstmodel.setValueAt(opcode,zeilennr,2);
+        lstmodel.setValueAt(lineNumber,zeilennr,3);
+        lstmodel.setValueAt(label,zeilennr,4);
+        lstmodel.setValueAt(command,zeilennr,5);
+        lstmodel.setValueAt(comment,zeilennr,6);
     }
 
     /*
