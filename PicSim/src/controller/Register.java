@@ -52,6 +52,7 @@ public class Register {
 
     private Prescaler prescaler;
     private Stack stack;
+    private EEPROM eeprom;
     private int cycles;
     private int w; //W-Register
     private int PCH = 0x00;
@@ -64,6 +65,7 @@ public class Register {
     public Register(Stack stack, EventListenerList listeners) {
         this.stack = stack;
         this.listeners = listeners;
+        this.eeprom = new EEPROM(this);
         cycles = 0;
         reg = new int[0xFF];
 
@@ -136,6 +138,9 @@ public class Register {
         if (((address & 0x7F) > GPR_END) || ((address & 0x7F) > GPR_END+OFFSET)) {
             return;
         }
+
+        checkEEPROM(address, value);
+        executeEEPROM();
 
         value = value & 0xFF;
         //Überprüung ob es sich um GPR (General Purpose Registers) oder SFR (Special Function Register) Adresse handelt
@@ -292,6 +297,53 @@ public class Register {
 
     public void resetWdt() {
         prescaler.watchdog.resetWdt();
+    }
+
+    private void checkEEPROM(int addr, int value) {
+        //schreibschutz auf EECON1
+        if (addr == EECON1) {
+            // letzten 2 bit nicht löschen
+            reg[EECON1] = reg[EECON1] & 0x03;
+            reg[EECON1] = reg[EECON1] | value;
+
+        } else {
+            //EECON2 STATE MACHINE
+            if (addr == EEADR) {
+                if (value == 0x55) {
+                    // 0x55 gesetzt
+                    eeprom.setState(1);
+                } else if (value == 0xAA && eeprom.getState() == 1) {
+                    // Write State
+                    eeprom.setState(2);
+                } else {
+                    // State auf Anfang
+                    eeprom.setState(0);
+                }
+            }
+        }
+    }
+
+    private void executeEEPROM() {
+        int value = reg[EEDATA];
+        int addr = reg[0x09];
+
+        boolean read = testBit(reg[EECON1], 0);
+        boolean write = testBit(reg[EECON1], 1);
+        boolean writeEnable = testBit(reg[EECON1], 2);
+
+        if (read) {
+            // EEPROM auslesen
+            reg[EEDATA] = eeprom.read(addr);
+            reg[EECON1] = reg[EECON1] & 0xFE;
+            //GUI benachrichtigen
+            notifyUpdateGUI(new UpdateGUIRegister(this, EEDATA, eeprom.read(addr)));
+
+        } else if (write && writeEnable && eeprom.getState() == 2) {
+            // ins EEPROM schreiben
+            eeprom.write(addr, value);
+            // State auf den Anfang setzen
+            eeprom.setState(0);
+        }
     }
 
     //Gibt den PC zurück

@@ -87,7 +87,7 @@ public class Interrupts {
         }
     }
 
-    /**
+    /*
      * Port RB Interrupt
      */
     private void PortRBInterrupt() throws NoRegisterAddressException {
@@ -102,7 +102,6 @@ public class Interrupts {
             }
         }
     }
-
 
     /*
      * Prüfen ob ein INT Interrupt aufgetreten ist

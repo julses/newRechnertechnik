@@ -26,45 +26,36 @@ public class Prescaler {
     }
 
     public void incPreScaler() {
+        try{
             preScaler++;
             if (preScaler >= getMaxPreScaler()) {
-                try {
-                    if (!watchdog.isWatchdog(register.getRegValue(OPTION_REG))) {
+                    if (watchdog.isWatchdog(register.getRegValue(OPTION_REG))) {
+                        watchdog.setWdt(watchdog.getWdt()+1);
+                    } else {
                         //TMR0++ und Overflow überprüfen
                         int value = (register.getRegValue(TMR0) + 1) & 0x0FF;
-                        register.setRegValue(TMR0, value);
+                        register.writeThrough(TMR0, value);
 
                         //check for TMR0 Overflow
                         if (value == 0x00) {
                             //interrupt occured, set T0IF Flag
-                            int intcon = register.getRegValue(Register.RegisterAdresses.INTCON);
-                            intcon = register.setBit(intcon, 2);
-                            register.setRegValue(INTCON, intcon);
+                            register.setRegValue(INTCON, register.setBit(register.getRegValue(INTCON), 2));
                         }
-                    } else {
-                        watchdog.setWdt(watchdog.getWdt()+1);
                     }
-                } catch (NoRegisterAddressException e) {
-                    e.printStackTrace();
                 }
                 resetPreScaler();
-            }
+            } catch (NoRegisterAddressException e) {
+            e.printStackTrace();
+        }
     }
 
 
-    public int getMaxPreScaler() {
-        int option = 0;
-        try {
-            option = register.getRegValue(OPTION_REG);
-        } catch (NoRegisterAddressException e) {
-            e.printStackTrace();
-        }
-        int val = option & 0x07;
+    public int getMaxPreScaler() throws NoRegisterAddressException {
+        int value = (register.getRegValue(OPTION_REG) & 0x07);
 
-            if (watchdog.isWatchdog(option)) {
-                return (int) Math.pow(2, val);
-            } else {
-                return (int) Math.pow(2, val) * 2;
-            }
+        if (watchdog.isWatchdog(register.getRegValue(OPTION_REG))) {
+            return (int) Math.pow(2, value);
+        }
+            return (int) Math.pow(2, value) * 2;
     }
 }

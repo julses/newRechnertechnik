@@ -778,7 +778,8 @@ public class Instructions {
     }
 
 
-    public void sleep(int instruction) {
+    public void sleep(int instruction) throws NoRegisterAddressException {
         System.out.println("sleep with: 0x" + Integer.toHexString(instruction));
+        register.incCycles();
     }
 }

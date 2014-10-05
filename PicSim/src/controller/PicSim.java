@@ -25,6 +25,7 @@ public class PicSim {
         Interrupts interrupts = new Interrupts(register, preScaler, stack);
         Scan scanner = new Scan(register);
         Pars parser = new Pars(instructions);
+        //GUI
         MenuBar menubar = new MenuBar(parser, scanner, register, interrupts);
         register.addGUIListener(new JMainWindow(menubar));
     }
