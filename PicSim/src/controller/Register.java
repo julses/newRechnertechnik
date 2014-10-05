@@ -1,6 +1,6 @@
-package model;
+package controller;
 
-import static model.Register.RegisterAdresses.*;
+import static controller.Register.RegisterAdresses.*;
 import exceptions.NoRegisterAddressException;
 import view.update.GUIListener;
 import view.update.UpdateGUIInfoField;
@@ -49,6 +49,7 @@ public class Register {
         public static final int Duration = -3;
     }
 
+    private Prescaler prescaler;
     private Stack stack;
     private int cycles;
     private int w; //W-Register
@@ -273,6 +274,10 @@ public class Register {
         }
     }
 
+    public void incPreScaler(){
+        prescaler.incPreScaler();
+    }
+
     //Gibt den PC zurück
     public int getPC() {
         return ((PCH << 8) + reg[PCL]);
@@ -420,4 +425,6 @@ public class Register {
         for ( GUIListener l : listeners.getListeners( GUIListener.class ) )
             l.update(event);
     }
+    //---------------------------------------------------------------------
+
 }

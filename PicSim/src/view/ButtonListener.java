@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 
-import static model.Register.RegisterAdresses.*;
+import static controller.Register.RegisterAdresses.*;
 
 import static view.Objects.*;
 

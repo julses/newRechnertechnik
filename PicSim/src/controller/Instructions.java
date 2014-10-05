@@ -1,7 +1,7 @@
-package model;
+package controller;
 
 import exceptions.NoRegisterAddressException;
-import static model.Register.RegisterAdresses.*;
+import static controller.Register.RegisterAdresses.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -498,10 +498,10 @@ public class Instructions {
      */
     public void btfsc(int instruction) throws NoRegisterAddressException {
         System.out.println("btfsc with: 0x" + Integer.toHexString(instruction));
-        instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
-        int pos = (instruction & 0x0380) >> 7;
+        int pos = (instruction & 0x0380) >>> 7;
         int f = register.getRegValue(address);
+        System.out.println("Value of btfsc: " + f + "  Position: " + pos);
         //Testet bit 'b' von f, wenn false dann nop()
         if(!register.testBit(f, pos)) {
             nop(instruction);
@@ -520,9 +520,8 @@ public class Instructions {
      */
     public void btfss(int instruction) throws NoRegisterAddressException {
         System.out.println("btfss with: 0x" + Integer.toHexString(instruction));
-        instruction = instruction & 0x00FF;
         int address = instruction & 0x007F;
-        int pos = (instruction & 0x0380) >> 7;
+        int pos = (instruction & 0x0380) >>> 7;
         int f = register.getRegValue(address);
         //Testet bit 'b' von f, wenn true dann nop(), nächste Anweisung wird übersprungen
         if(register.testBit(f, pos)) {

@@ -6,14 +6,13 @@ import exceptions.NoRegisterAddressException;
 import view.update.*;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static model.Register.RegisterAdresses.*;
+import static controller.Register.RegisterAdresses.*;
 import static view.Objects.*;
 
 /**
@@ -411,11 +410,11 @@ public class JMainWindow implements ActionListener, GUIListener {
         try {
             menuBar.step();
         } catch (NoInstructionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (NoRegisterAddressException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (NoInstructionFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
     }
 
@@ -536,8 +535,8 @@ public class JMainWindow implements ActionListener, GUIListener {
                 pc.setText(String.valueOf(Integer.toHexString(value)));
                 tablelst.changeSelection((buttonListener.lineConverter[value])-1, 0, false, false);
                 if (lstmodel.getValueAt((buttonListener.lineConverter[value]-1),0).equals("b")){
-                        stop();
-                    }
+                    stop();
+                }
                 break;
             case W:
                 wreg.setText(String.valueOf(Integer.toHexString(value)));

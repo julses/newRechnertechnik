@@ -1,8 +1,8 @@
-package model;
+package controller;
 
 import exceptions.NoRegisterAddressException;
 
-import static model.Register.RegisterAdresses.*;
+import static controller.Register.RegisterAdresses.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,9 +16,13 @@ public class Interrupts {
     private int prevPortA;
     private int prevPortB;
     private Register register;
+    private Prescaler prescaler;
+    private Stack stack;
 
-    public Interrupts(Register register) {
+    public Interrupts(Register register, Prescaler preScaler, Stack stack) {
         this.register = register;
+        this.prescaler = preScaler;
+        this.stack = stack;
     }
 
     //Taster und TMR0
@@ -56,7 +60,7 @@ public class Interrupts {
             if (register.testBit(register.getRegValue(OPTION_REG), 4) != register.testBit(register.getRegValue(PORTA), 4)) {
                 if (!register.testBit(register.getRegValue(OPTION_REG), 3)) {
                     //TMR0 PreScaler
-                    //ioUnit.incPreScaler();
+                    prescaler.incPreScaler();
                 } else {
                     //wdt prescaler
                     //TMR0++
@@ -133,6 +137,7 @@ public class Interrupts {
             register.setRegValue(TMR0, value);
 
             // TMR0 Overflow?
+            //register.checkZeroBit(register.getRegValue(TMR0));
             if (register.getRegValue(TMR0) == 0x00) {
                 // T0IF = 1
                 register.setRegValue(INTCON, register.setBit(register.getRegValue(INTCON), 2));
@@ -153,8 +158,9 @@ public class Interrupts {
         int intcon = register.getRegValue(INTCON);
         //set GIE to 0
         intcon = register.clearBit(intcon, 7);
+
         register.setRegValue(INTCON, intcon);
-        //stack.push(register.getPC());
+        stack.push(register.getPC());
         register.setPC(0x04);
     }
 

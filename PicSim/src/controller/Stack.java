@@ -1,8 +1,6 @@
-package model;
+package controller;
 
 import view.update.GUIListener;
-import view.update.UpdateGUIInfoField;
-import view.update.UpdateGUIRegister;
 import view.update.UpdateGUIStack;
 
 import javax.swing.event.EventListenerList;

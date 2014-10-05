@@ -1,4 +1,4 @@
-package model;
+package controller;
 
 import view.JMainWindow;
 import view.MenuBar;
@@ -20,7 +20,9 @@ public class PicSim {
         Stack stack = new Stack(guiListener);
         Register register = new Register(stack, guiListener);
         Instructions instructions = new Instructions(register, stack);
-        Interrupts interrupts = new Interrupts(register);
+        Watchdog watchdog = new Watchdog(register);
+        Prescaler preScaler = new Prescaler(register, watchdog);
+        Interrupts interrupts = new Interrupts(register, preScaler, stack);
         Scan scanner = new Scan(register);
         Pars parser = new Pars(instructions);
         MenuBar menubar = new MenuBar(parser, scanner, register, interrupts);

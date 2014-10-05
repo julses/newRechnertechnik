@@ -1,4 +1,4 @@
-package model;
+package controller;
 
 import exceptions.NoInstructionException;
 import exceptions.NoRegisterAddressException;

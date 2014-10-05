@@ -1,4 +1,4 @@
-package model;
+package controller;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -6,13 +6,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import exceptions.NoInstructionFoundException;
-import model.Converter;
 
 /**
  * Created with IntelliJ IDEA.
@@ -63,7 +61,7 @@ public class Scan {
                 }*/
             }
         }
-        dotxt(hexCode, "HexCodeBefehle");
+        //dotxt(hexCode, "HexCodeBefehle");
         //dotxt(binaryCode, "BinärCodeBefehle");
         br.close();
     }

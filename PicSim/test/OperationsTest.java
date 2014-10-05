@@ -1,8 +1,8 @@
-import model.Instructions;
-import model.Pars;
-import model.Register;
-import static model.Register.RegisterAdresses.*;
-import model.Stack;
+import controller.Instructions;
+import controller.Pars;
+import controller.Register;
+import static controller.Register.RegisterAdresses.*;
+import controller.Stack;
 import org.junit.Test;
 
 import javax.swing.event.EventListenerList;

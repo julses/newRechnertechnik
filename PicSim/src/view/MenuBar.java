@@ -3,7 +3,7 @@ package view;
 import exceptions.NoInstructionException;
 import exceptions.NoInstructionFoundException;
 import exceptions.NoRegisterAddressException;
-import model.*;
+import controller.*;
 
 import javax.swing.*;
 import java.awt.*;
