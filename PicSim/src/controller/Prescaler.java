@@ -13,7 +13,7 @@ import exceptions.NoRegisterAddressException;
 public class Prescaler {
 
     private Register register;
-    private Watchdog watchdog;
+    public Watchdog watchdog;
     private int preScaler;
 
     public Prescaler(Register register, Watchdog watchdog) {

@@ -17,6 +17,7 @@ import javax.swing.event.EventListenerList;
  * To change this template use File | Settings | File Templates.
  */
 public class Register {
+
     public class RegisterAdresses {
         //***********************************
         //Register Adressen
@@ -276,6 +277,14 @@ public class Register {
 
     public void incPreScaler(){
         prescaler.incPreScaler();
+    }
+
+    public void resetPreScaler(){
+        prescaler.resetPreScaler();
+    }
+
+    public void resetWdt() {
+        prescaler.watchdog.resetWdt();
     }
 
     //Gibt den PC zurück

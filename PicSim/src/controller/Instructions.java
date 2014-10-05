@@ -740,14 +740,32 @@ public class Instructions {
         register.incCycles();
     }
 
-
-    public void clrwdt(int instruction) {
+    /*
+     *Clear WatchdogTimer
+     */
+    public void clrwdt(int instruction) throws NoRegisterAddressException {
         System.out.println("clrwdt with: 0x" + Integer.toHexString(instruction));
+        register.resetWdt();
+        if(register.testBit(OPTION_REG, 3)){
+            register.resetPreScaler();
+        }
+        register.setRegValue(STATUS, register.getRegValue(STATUS) | 0x18);
+        //Cycle
+        register.incCycles();
     }
 
-
-    public void retfie(int instruction) {
+    /*
+     *Return from Interrupt
+     */
+    public void retfie(int instruction) throws NoRegisterAddressException {
         System.out.println("retfie with: 0x" + Integer.toHexString(instruction));
+        //PC von Stack holen und setzen
+        register.setPC(stack.pop());
+        //1-->GIE
+        register.setBit(INTCON, 7);
+        // 2 Cycles
+        register.incCycles();
+        register.incCycles();
     }
 
 
