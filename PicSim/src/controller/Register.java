@@ -232,11 +232,18 @@ public class Register {
         notifyUpdateGUI(new UpdateGUIRegister(this, selectBank(address), value));
     }
 
+    public void writeThrough(int address, int value) {
+        reg[address] = value;
+        //Benachrichtigt GUI
+        notifyUpdateGUI(new UpdateGUIRegister(this, address, value));
+    }
+
     //Addresse an gewählte Bank anpassen
     private int selectBank(int address) {
         int bankMask = ((reg[STATUS] & 0x20) << 2);
         return bankMask | address;
     }
+
 
     //Gibt den Wert einer Addresse zurück
     public int getRegValue(int address) throws NoRegisterAddressException {

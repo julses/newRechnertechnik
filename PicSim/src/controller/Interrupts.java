@@ -109,7 +109,7 @@ public class Interrupts {
      */
     private void checkINTInterrupt() throws NoRegisterAddressException {
         //GIE = 1, INTE = 1 und INTf = 1?
-        if (register.testBit(INTCON, 7) && register.testBit(INTCON, 4) && register.testBit(INTCON, 1)) {
+        if (register.testBit(register.getRegValue(INTCON), 7) && register.testBit(register.getRegValue(INTCON), 4) && register.testBit(register.getRegValue(INTCON), 1)) {
             executeInterrupt();
         }
     }
@@ -118,9 +118,9 @@ public class Interrupts {
      * Prüfen ob ein Port RB Interrupt aufgetreten ist
      */
     private void checkPortRBInterrupt() throws NoRegisterAddressException {
-        if (register.testBit(INTCON, 0)) {
+        if (register.testBit(register.getRegValue(INTCON), 0)) {
             //GIE = 1 und RBIE = 1?
-            if (register.testBit(INTCON, 7) && register.testBit(INTCON, 3)) {
+            if (register.testBit(register.getRegValue(INTCON), 7) && register.testBit(register.getRegValue(INTCON), 3)) {
                 executeInterrupt();
             }
         }
@@ -131,13 +131,12 @@ public class Interrupts {
      */
     private void checkTMR0Interrupt() throws NoRegisterAddressException {
         //T0CS != 1 -> timer mode aktive
-        if (!register.testBit(register.getRegValue(OPTION_REG), 5)) {
+        if (!register.testBit(register.getRegValue(OPTION_REG), 5) ) {
             // TMR0++
             int value = (register.getRegValue(TMR0) + 1) & 0x0FF;
-            register.setRegValue(TMR0, value);
+            register.writeThrough(TMR0, value);
 
             // TMR0 Overflow?
-            //register.checkZeroBit(register.getRegValue(TMR0));
             if (register.getRegValue(TMR0) == 0x00) {
                 // T0IF = 1
                 register.setRegValue(INTCON, register.setBit(register.getRegValue(INTCON), 2));
@@ -158,7 +157,6 @@ public class Interrupts {
         int intcon = register.getRegValue(INTCON);
         //set GIE to 0
         intcon = register.clearBit(intcon, 7);
-
         register.setRegValue(INTCON, intcon);
         stack.push(register.getPC());
         register.setPC(0x04);
